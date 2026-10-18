@@ -40,6 +40,58 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
+// Hero video audio: browsers block autoplay with sound,
+// so start muted and enable voice on first user interaction.
+const heroVideo = document.getElementById("hero-video");
+const audioToggle = document.getElementById("video-audio-toggle");
+
+if (heroVideo && audioToggle) {
+  const icon = audioToggle.querySelector(".audio-icon");
+
+  const syncUI = () => {
+    icon.textContent = heroVideo.muted ? "SOUND OFF" : "SOUND ON";
+    audioToggle.setAttribute(
+      "aria-label",
+      heroVideo.muted ? "Unmute video sound" : "Mute video sound"
+    );
+  };
+
+  const enableSound = () => {
+    if (heroVideo.muted) {
+      heroVideo.muted = false;
+      heroVideo.volume = 1;
+      heroVideo.play().catch(() => {});
+    }
+    syncUI();
+  };
+
+  // Browsers require a user gesture before playing audio.
+  const gestureEvents = ["pointerdown", "keydown", "touchstart"];
+  const onFirstGesture = (event) => {
+    cleanupGestures();
+    // Let the toggle button handle its own clicks.
+    if (audioToggle.contains(event.target)) return;
+    enableSound();
+  };
+  const cleanupGestures = () => {
+    gestureEvents.forEach((evt) =>
+      window.removeEventListener(evt, onFirstGesture)
+    );
+  };
+  gestureEvents.forEach((evt) =>
+    window.addEventListener(evt, onFirstGesture)
+  );
+
+  audioToggle.addEventListener("click", (event) => {
+    event.stopPropagation();
+    heroVideo.muted = !heroVideo.muted;
+    if (!heroVideo.muted) heroVideo.play().catch(() => {});
+    syncUI();
+  });
+
+  syncUI();
+}
+
 const form = document.getElementById("access-form");
 const message = document.getElementById("form-message");
 
