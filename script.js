@@ -1,8 +1,8 @@
 const yearElement = document.getElementById("year");
 if (yearElement) yearElement.textContent = new Date().getFullYear();
 
-// Countdown timer - Launch on December 17, 2026 at 12:00 AM PKT (UTC+5)
-const launchDate = new Date("2026-12-17T00:00:00+05:00");
+// Countdown timer - Launch on November 17, 2026 at 12:00 AM PKT (UTC+5)
+const launchDate = new Date("2026-11-17T00:00:00+05:00");
 const countdownElement = document.getElementById("countdown");
 const daysElement = document.getElementById("days");
 const hoursElement = document.getElementById("hours");
