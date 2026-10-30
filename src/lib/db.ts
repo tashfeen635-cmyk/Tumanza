@@ -1,4 +1,16 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env fallback if not already provided by PM2 or process environment
+if (!process.env.MONGO_URI && !process.env.MONGODB_URI && !process.env.DATABASE_URL) {
+  dotenv.config();
+  dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+  dotenv.config({ path: path.resolve(process.cwd(), '.env.production') });
+  try {
+    dotenv.config({ path: '/var/www/Tumanza/.env' });
+  } catch {}
+}
 
 interface MongooseCache {
   conn: typeof mongoose | null;
