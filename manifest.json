@@ -1,0 +1,19 @@
+{
+  "name": "Peak Nuts - Premium Organic Nuts & Superfoods",
+  "short_name": "Peak Nuts",
+  "description": "Shop premium organic nuts, herbs, teas & supplements",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#fbf7f1",
+  "theme_color": "#dfceae",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["shopping", "food"]
+}

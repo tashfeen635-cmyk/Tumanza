@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop - Tumanza</title>
+  <meta name="description" content="Shop Tumanza Ã¢â‚¬â€ browse our full range of premium organic nuts, seeds, herbs & teas.">
+  <meta name="theme-color" content="#dfceae">
+  <meta property="og:title" content="Shop - Tumanza">
+  <meta property="og:description" content="Browse our full range of premium organic nuts, seeds, herbs & teas.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tumanza.com/shop.html">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-container">
+        <div class="header-left">
+          <a href="index.html" class="site-logo"><img src="img/logo.jpeg" width="120" alt="Tumanza"></a>
+          <nav class="main-nav" id="mainNav">
+            <ul class="nav-menu">
+              <li><a href="index.html">HOME</a></li>
+              <li><a href="shop.html" class="active">SHOP</a></li>
+              <li><a href="about.html">ABOUT</a></li>
+              <li><a href="contact.html">CONTACT</a></li>
+            </ul>
+          </nav>
+        </div>
+        <div class="header-center" style="display:none;"></div>
+      <div class="header-right">
+        <button class="header-icon" aria-label="Search" id="searchToggle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <a href="shop.html" class="header-icon" aria-label="Shop">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39A2 2 0 0 0 9.66 17h8.66a2 2 0 0 0 1.97-1.61L23 6H6"></path>
+          </svg>
+        </a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="search-overlay" id="searchOverlay">
+      <div class="search-overlay-inner">
+        <div class="search-input-row">
+          <svg class="search-input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Search nuts, herbs, teas, supplements..." class="search-input">
+          <button class="search-close" id="searchClose" aria-label="Close search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="search-results" id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <ul class="mobile-nav-menu">
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="shop.html">SHOP</a></li>
+        <li><a href="about.html">ABOUT</a></li>
+        <li><a href="contact.html">CONTACT</a></li>
+      </ul>
+    </div>
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+  </header>
+
+  <!-- ========== SHOP HERO ========== -->
+  <section class="hero" style="min-height: 50vh;">
+    <div class="hero-overlay"></div>
+    <div class="hero-inner">
+      <div class="hero-content">
+        <p class="hero-subtitle">Tumanza COLLECTION</p>
+        <h1 class="hero-title">Shop All Products</h1>
+        <p class="hero-text">Explore our full range of premium organic nuts, seeds, herbs, teas and supplements.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== INLINE SEARCH BAR + FILTERS ========== -->
+  <section class="inline-search" id="inlineSearch">
+    <div class="container">
+      <div class="inline-search-head">
+        <span class="inline-search-eyebrow">QUICK SEARCH</span>
+        <h2 class="inline-search-title">Find your favorite organic picks</h2>
+        <p class="inline-search-subtitle">Search by product, category or ingredient &mdash; results appear as you type.</p>
+      </div>
+      <div class="inline-search-inner">
+        <span class="inline-search-icon-wrap">
+          <svg class="inline-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input type="text" id="inlineSearchInput" class="inline-search-input" placeholder="Search nuts, seeds, herbs, teas, supplements...">
+        <button class="inline-search-clear" id="inlineSearchClear" type="button" aria-label="Clear search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="inline-search-tags">
+        <span class="inline-search-tags-label">Popular:</span>
+        <button type="button" class="inline-search-tag" data-search-term="Almonds">Almonds</button>
+        <button type="button" class="inline-search-tag" data-search-term="Seeds">Seeds</button>
+        <button type="button" class="inline-search-tag" data-search-term="Herbs">Herbs</button>
+        <button type="button" class="inline-search-tag" data-search-term="Tea">Tea</button>
+        <button type="button" class="inline-search-tag" data-search-term="Shilajit">Shilajit</button>
+      </div>
+      <div class="inline-search-results" id="inlineSearchResults"></div>
+
+      <!-- Filter & Sort Controls -->
+      <div id="shopFilters" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;align-items:center;">
+        <select id="filterCategory" style="padding:8px 14px;border:1px solid #ddd;border-radius:6px;font-size:13px;background:#fff;cursor:pointer;min-width:140px;">
+          <option value="">All Categories</option>
+          <option value="Nuts">Nuts</option>
+          <option value="Herbs & Supplements">Herbs & Supplements</option>
+          <option value="Teas">Teas</option>
+          <option value="Mixes & Butters">Mixes & Butters</option>
+          <option value="Spices">Spices</option>
+        </select>
+        <select id="filterPrice" style="padding:8px 14px;border:1px solid #ddd;border-radius:6px;font-size:13px;background:#fff;cursor:pointer;min-width:140px;">
+          <option value="">All Prices</option>
+          <option value="0-15">Under Rs.15</option>
+          <option value="15-25">Rs.15 - Rs.25</option>
+          <option value="25-50">Rs.25 - Rs.50</option>
+          <option value="50-100">Rs.50+</option>
+        </select>
+        <select id="filterRating" style="padding:8px 14px;border:1px solid #ddd;border-radius:6px;font-size:13px;background:#fff;cursor:pointer;min-width:120px;">
+          <option value="">All Ratings</option>
+          <option value="5">5 Stars</option>
+          <option value="4">4+ Stars</option>
+          <option value="3">3+ Stars</option>
+        </select>
+        <select id="sortBy" style="padding:8px 14px;border:1px solid #ddd;border-radius:6px;font-size:13px;background:#fff;cursor:pointer;min-width:150px;">
+          <option value="">Sort By</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="rating">Highest Rated</option>
+          <option value="name">Name: A-Z</option>
+        </select>
+        <span id="filterCount" style="font-size:13px;color:#666;margin-left:auto;"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PAGINATED PRODUCTS GRID (Shop Page) ========== -->
+  <section class="products-section" id="shopPaginatedSection" style="display:none;">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">All Products</h2>
+        <p class="section-subtitle">Browse our complete collection of premium organic products</p>
+      </div>
+      <div class="products-grid" id="shopPaginatedGrid"></div>
+      <div id="shopPagination"></div>
+    </div>
+  </section>
+
+
+
+  <!-- ========== POPULAR PRODUCTS ========== -->
+  <section class="products-section" id="shop" data-section-name="popular">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Popular Products</h2>
+        <p class="section-subtitle">Our most loved organic nuts that customers keep coming back for</p>
+      </div>
+      <div class="products-grid" id="popularGrid"></div>
+    </div>
+  </section>
+
+  <!-- ========== FEATURES ========== -->
+  <section class="features">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="3" width="15" height="13"></rect>
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+              <circle cx="5.5" cy="18.5" r="2.5"></circle>
+              <circle cx="18.5" cy="18.5" r="2.5"></circle>
+            </svg>
+          </div>
+          <h3>Free Shipping</h3>
+          <p>On all orders over Rs.5933</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
+          <h3>100% Organic</h3>
+          <p>Certified organic products</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </div>
+          <h3>Secure Payment</h3>
+          <p>100% secure checkout</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </div>
+          <h3>Farm Fresh</h3>
+          <p>Direct from organic farms</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== NEWSLETTER ========== -->
+  <section class="newsletter">
+    <div class="container">
+      <div class="newsletter-inner">
+        <h2 class="newsletter-title">Join Our Newsletter</h2>
+        <p class="newsletter-text">Subscribe to get seasonal recipes, exclusive discounts, and first access to new arrivals.</p>
+        <form class="newsletter-form" id="newsletterForm" novalidate>
+          <input type="email" name="email" autocomplete="email" placeholder="Enter your email address" required aria-label="Email address">
+          <button type="submit" class="btn btn-primary">SUBSCRIBE</button>
+        </form>
+        <p class="newsletter-feedback" id="newsletterFeedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col">
+            <a href="index.html" class="footer-logo">Tumanza</a>
+            <p class="footer-about">Premium organic nuts sourced directly from sustainable farms. Natural, wholesome, and packed fresh for your family.</p>
+            <div class="footer-social">
+              <a href="https://www.facebook.com/tumanza.official/" target="_blank" rel="noopener" aria-label="Facebook">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+              </a>
+              <a href="https://www.instagram.com/tumanza.official/" target="_blank" rel="noopener" aria-label="Instagram">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><circle cx="12" cy="12" r="5"></circle><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none"></circle></svg>
+              </a>
+            </div>
+          </div>
+          <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul class="footer-links">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="shop.html">Shop</a></li>
+              <li><a href="about.html">About Us</a></li>
+              <li><a href="contact.html">Contact</a></li>
+              <li><a href="account.html">My Account</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Customer Service</h4>
+            <ul class="footer-links">
+              <li><a href="#" data-policy="shipping">Shipping Policy</a></li>
+              <li><a href="#" data-policy="returns">Return & Refund</a></li>
+              <li><a href="#" data-policy="privacy">Privacy Policy</a></li>
+              <li><a href="#" data-policy="terms">Terms & Conditions</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Contact Info</h4>
+            <ul class="footer-contact">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                42 Orchard Lane, Portland, OR 97201
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                +1 (503) 555-0192
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                hello@tumanza.com
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 Tumanza. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== PRODUCT DETAIL MODAL ========== -->
+  <div class="product-modal-overlay" id="productModalOverlay"></div>
+  <div class="product-modal" id="productModal">
+    <button class="product-modal-close" id="productModalClose" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="product-modal-inner">
+      <div class="product-modal-image">
+        <div class="special-img-wrapper">
+          <img id="modalProductImg" src="" alt="" loading="lazy">
+          <div class="special-badge" id="modalProductBadge"></div>
+        </div>
+        <div class="special-img-bg"></div>
+      </div>
+      <div class="product-modal-content">
+        <span class="special-tag" id="modalProductCategory">CATEGORY</span>
+        <h2 class="special-title" id="modalProductName"></h2>
+        <p class="product-modal-urdu" id="modalProductUrdu"></p>
+        <p class="special-description" id="modalProductDesc"></p>
+        <div class="special-benefits" id="modalProductBenefits"></div>
+        <div class="special-pricing">
+          <div class="special-price">
+            <span class="special-price-old" id="modalProductOldPrice"></span>
+            <span class="special-price-current" id="modalProductPrice"></span>
+          </div>
+          <div class="special-rating">
+            <span class="stars" id="modalProductStars"></span>
+            <span class="rating-count" id="modalProductStock"></span>
+          </div>
+        </div>
+        <div class="special-actions">
+          <button class="btn btn-primary btn-order-now" id="modalOrderBtn">ORDER NOW</button>
+          <button class="btn btn-outline" id="modalCloseBtn">GO BACK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== POLICY MODAL ========== -->
+  <div class="policy-modal-overlay" id="policyModalOverlay"></div>
+  <div class="policy-modal" id="policyModal">
+    <button class="policy-modal-close" id="policyModalClose" aria-label="Close">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <h2 class="policy-modal-title" id="policyModalTitle"></h2>
+    <div class="policy-modal-body" id="policyModalBody"></div>
+  </div>
+
+  <!-- ========== BACK TO TOP ========== -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <!-- ========== ORDER NOW POPUP ========== -->
+  <div class="order-popup-overlay" id="orderPopupOverlay"></div>
+  <div class="order-popup" id="orderPopup">
+    <button class="order-popup-close" id="orderPopupClose" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <h3 class="order-popup-title">Place Your Order</h3>
+    <p class="order-popup-product" id="orderProductName"></p>
+    <form id="orderForm">
+      <div class="order-form-row">
+        <div class="order-form-group">
+          <label for="orderFirstName">First Name *</label>
+          <input type="text" id="orderFirstName" required placeholder="First name">
+        </div>
+        <div class="order-form-group">
+          <label for="orderLastName">Last Name *</label>
+          <input type="text" id="orderLastName" required placeholder="Last name">
+        </div>
+      </div>
+      <div class="order-form-group">
+        <label for="orderEmail">Email *</label>
+        <input type="email" id="orderEmail" required placeholder="your@email.com">
+      </div>
+      <div class="order-form-group">
+        <label for="orderPhone">Mobile Number *</label>
+        <input type="tel" id="orderPhone" required placeholder="e.g. 0300-1234567">
+      </div>
+      <div class="order-form-group">
+        <label for="orderCity">City *</label>
+        <input type="text" id="orderCity" required placeholder="e.g. Lahore">
+      </div>
+      <div class="order-form-group">
+        <label for="orderAddress">Address *</label>
+        <textarea id="orderAddress" required placeholder="Full delivery address" rows="2"></textarea>
+      </div>
+      <div class="order-form-group">
+        <label for="orderPostcode">Postcode / ZIP *</label>
+        <input type="text" id="orderPostcode" required placeholder="e.g. 54000">
+      </div>
+      <p id="orderError" style="display:none;color:#b00020;font-size:13px;margin:0 0 10px;text-align:center;"></p>
+      <button type="submit" class="btn btn-primary btn-block" id="orderSubmitBtn">SUBMIT ORDER</button>
+    </form>
+    <div class="order-popup-success" id="orderSuccess" style="display:none;">
+      <div class="order-success-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h4>Order Submitted!</h4>
+      <p>We'll contact you shortly to confirm your order.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(function(){});}</script>
+</body>
+</html>
+
