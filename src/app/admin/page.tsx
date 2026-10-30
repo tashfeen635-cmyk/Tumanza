@@ -663,6 +663,7 @@ export default function AdminPage() {
                                 }
                                 alt={p.name}
                                 fill
+                                unoptimized
                                 className="object-cover"
                               />
                             )}

@@ -22,8 +22,13 @@ export async function connectDB(): Promise<typeof mongoose> {
     throw new Error('MONGO_URI env variable is not set');
   }
 
-  if (cached.conn) {
+  if (cached.conn && cached.conn.connection.readyState === 1) {
     return cached.conn;
+  }
+
+  if (cached.conn && cached.conn.connection.readyState !== 1) {
+    cached.conn = null;
+    cached.promise = null;
   }
 
   if (!cached.promise) {
