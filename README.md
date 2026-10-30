@@ -1,78 +1,64 @@
-# Peak Nuts
+# Tumanza — Next.js Full Stack Storefront & Admin Portal
 
-Static storefront + admin dashboard with a single Express/MongoDB API.
+A full-stack e-commerce application built with **Next.js (App Router)**, **React**, **TypeScript**, **Tailwind CSS**, and **MongoDB (Mongoose)**.
 
-## Structure
+## Architecture
 
-| Path | Purpose |
+| Route / Module | Purpose |
 | --- | --- |
-| `*.html`, `styles.css`, `script.js`, `account.js`, `admin.js` | Static frontend (served by Vercel) |
-| `api/index.js` | The one backend: Express app (MongoDB via Mongoose). Exported as a Vercel serverless function, and runnable locally. |
-| `sw.js` | Service worker (network-first, cache fallback) |
-| `vercel.json` | Routing, `cleanUrls`, security headers |
-| `scripts/smoke-test.js` | End-to-end smoke test |
+| `src/app/page.tsx` | Home Page: Hero, live quick search, popular products, Himalayan Shilajit & Tumoro spotlight, customer reviews, newsletter, and Instagram feed |
+| `src/app/shop/page.tsx` | Shop Page: Product filtering by category, price, and star rating, sorting, and paginated product grid |
+| `src/app/about/page.tsx` | About Page: Farm origins in Gilgit-Baltistan, mountain harvesters, core values, and transparency |
+| `src/app/contact/page.tsx` | Contact Page: Interactive contact message form, operating hours, and location info |
+| `src/app/account/page.tsx` | User Account: Authentication tabs, 3-step OTP password reset flow, email verification banner, profile updates, order history, and saved wishlist |
+| `src/app/admin/page.tsx` | Admin Portal: Dashboard overview with 4 KPI cards, monthly revenue bar chart, product management (Add/Edit/Delete), order fulfillment & status updating, subscribers list, registered users, review moderation, and sales analytics |
+| `src/app/api/*` | Next.js Serverless Route Handlers for all 27 backend endpoints |
+| `src/components/*` | Reusable UI components (Header, Footer, ProductModal, OrderPopup, PolicyModal, InlineSearch, ProductCard, Features, Newsletter, BackToTop) |
+| `src/context/StoreContext.tsx` | React Context for global state (cart/orders, authentication, wishlist, modals, cached products) |
+| `src/lib/*` | Database connection (`db.ts`), password hashing & auth middleware (`auth.ts`), nodemailer email templates (`email.ts`), TypeScript definitions (`types.ts`) |
+| `src/models/*` | Mongoose schemas & models for Products, Orders, Users, Reviews, Wishlist, Subscribers, Revenue, Counters, and Tokens |
 
-There is intentionally **a single backend** (`api/index.js`) so local dev and
-production behave identically.
+## Environment Variables
 
-## Environment variables
-
-Set these in the Vercel project (and in a local `.env` for development):
+Configure these in `.env.local` (for development) and in your deployment dashboard:
 
 | Variable | Required | Description |
 | --- | --- | --- |
-| `MONGO_URI` | yes | MongoDB connection string |
-| `ADMIN_USERNAME` | yes | Admin login username |
-| `ADMIN_PASSWORD` | yes | Admin login password (use a strong, unique value) |
-| `EMAIL_USER` | no | Gmail address used as the sender for notification emails |
-| `EMAIL_PASS` | no | Gmail app password |
-| `SITE_URL` | no | Public base URL used in verification links (default: the Vercel alias) |
+| `MONGO_URI` | yes | MongoDB Atlas connection string |
+| `ADMIN_USERNAME` | yes | Admin dashboard login username |
+| `ADMIN_PASSWORD` | yes | Admin dashboard login password |
+| `EMAIL_USER` | no | Gmail SMTP address for order confirmations and reset codes |
+| `EMAIL_PASS` | no | Gmail App password |
+| `SITE_URL` | no | Base URL for email verification links (e.g. `http://localhost:3000`) |
 
-Order/verification emails are sent with `nodemailer`; if the email variables are
-not set, the site still works and email sending is logged and skipped.
-
-## Local development
+## Local Development
 
 ```bash
+# 1. Install dependencies
 npm install
-# create .env with MONGO_URI, ADMIN_USERNAME, ADMIN_PASSWORD ...
-npm start          # serves api/index.js on http://localhost:5000
+
+# 2. Run the Next.js development server
+npm run dev
+
+# 3. Open in browser
+# Storefront: http://localhost:3000
+# Admin Dashboard: http://localhost:3000/admin
 ```
 
-The API reads `PORT` (default `5000`).
-
-## Deploy
-
-Push to the `main` branch of the Vercel-connected repository. `vercel.json`
-pins `framework: null` so the static site is not mistaken for a root server, and
-rewrites `/api/*` to the `api/index.js` function.
-
-## Scripts
+## Production Build
 
 ```bash
-npm run check      # syntax-check all JS files
-npm start          # run the API locally
-npm run smoke      # smoke-test the live site (or: npm run smoke http://localhost:5000)
+# Type check and build optimized production bundle
+npm run build
+
+# Start production server
+npm start
 ```
 
-## API overview
+## Security & Best Practices
 
-Public: `GET /api/products`, `GET /api/reviews/:productId`,
-`POST /api/orders`, `POST /api/subscribers`, `POST /api/register`,
-`POST /api/user/login`, `POST /api/forgot-password`,
-`POST /api/verify-reset-code`, `POST /api/reset-password`,
-`POST /api/verify-email`.
-
-Admin (Bearer token): `/api/login`, `/api/orders`, `/api/products`,
-`/api/subscribers`, `/api/revenue`, `/api/admin/*`.
-
-User (Bearer token): `/api/user/profile`, `/api/user/orders`,
-`/api/user/wishlist`.
-
-## Security notes
-
-- Prices are always recomputed server-side from the catalog; client prices are ignored.
-- Admin and user sessions use random 32-byte tokens with a 24h TTL.
-- Rate limiting on auth and public-write endpoints; `trust proxy` is set for Vercel.
-- Errors return a generic message; details are logged server-side only.
-- See `vercel.json` for the Content-Security-Policy and other response headers.
+- **Zero-trust pricing:** Product prices in order submissions are always resolved and validated server-side against the database catalog.
+- **Constant-time password & OTP comparisons:** Using `crypto.scrypt` and `crypto.timingSafeEqual`.
+- **Atomic Order Sequences:** Monotonic collision-free `PN-xxxx` order IDs powered by Mongoose atomic counters.
+- **Serverless Cached Connection:** Mongoose connection pooling cached globally across hot/cold Next.js route handler invocations.
+- **Responsive & Accessible:** Fully mobile-friendly with keyboard navigation and modal trap support.

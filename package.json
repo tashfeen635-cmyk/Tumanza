@@ -1,18 +1,33 @@
 {
-  "name": "peak-nuts",
+  "name": "tumanza",
   "version": "1.0.0",
-  "description": "Peak Nuts storefront + admin dashboard (static frontend + Express/Mongo API)",
-  "main": "api/index.js",
+  "description": "Tumanza - Next.js Full Stack Storefront & Admin Dashboard",
   "scripts": {
-    "start": "node api/index.js",
-    "check": "node --check api/index.js && node --check script.js && node --check account.js && node --check admin.js && node --check sw.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "check": "next build",
     "smoke": "node scripts/smoke-test.js"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.1",
+    "lucide-react": "^1.65.0",
     "mongoose": "^8.9.5",
-    "nodemailer": "^8.0.2"
+    "next": "^16.4.3",
+    "nodemailer": "^8.0.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/nodemailer": "^8.0.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.6.2",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2"
   }
 }

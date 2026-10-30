@@ -1,0 +1,158 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { useStore } from '@/context/StoreContext';
+import {
+  InlineSearch,
+  ProductCard,
+  Features,
+  Newsletter,
+} from '@/components';
+
+export default function HomePage() {
+  const { allProducts } = useStore();
+
+  const popularProducts = allProducts.filter((p) => p.section === 'popular');
+  const baseProducts = popularProducts.length > 0 ? popularProducts : allProducts;
+  const displayProducts = baseProducts.slice(0, 6);
+
+  const testimonials = [
+    {
+      name: 'Sarah M.',
+      role: 'Verified Buyer',
+      text: "The freshest almonds I've ever tasted. You can really tell the difference with organic. My family goes through a bag every week now!",
+    },
+    {
+      name: 'Emily R.',
+      role: 'Verified Buyer',
+      text: "I've tried every nut brand out there, and Tumanza is hands down the best. The trail mix is addictive, and I love that everything is organic.",
+    },
+    {
+      name: 'James L.',
+      role: 'Verified Buyer',
+      text: 'Fast delivery, eco-friendly packaging, and the cashews are unbelievably fresh. Tumanza has become our household staple. Highly recommend!',
+    },
+  ];
+
+  const instagramImages = [
+    '/images/shilajit.png',
+    '/images/product-pack.jpg',
+    '/images/showcase.png',
+    '/img/hero.jpg',
+    '/img/hero-mobile.png',
+    '/images/product-pack.jpg',
+  ];
+
+  return (
+    <div>
+      {/* ========== HERO SECTION ========== */}
+      <section className="hero">
+        <div className="hero-overlay"></div>
+        <div className="hero-inner">
+          <div className="hero-content">
+            <p className="hero-subtitle">100% ORGANIC</p>
+            <h1 className="hero-title">Nature&apos;s Finest Organic Nuts &amp; Seeds</h1>
+            <p className="hero-text">
+              Handpicked from the best farms around the world. Pure, raw, and packed with natural
+              goodness for a healthier you.
+            </p>
+            <Link href="/shop" className="btn btn-white">
+              SHOP NOW
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== INLINE SEARCH BAR ========== */}
+      <InlineSearch />
+
+      {/* ========== POPULAR PRODUCTS ========== */}
+      <section className="products-section" id="shop" data-section-name="popular">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">Popular Products</h2>
+            <p className="section-subtitle">
+              Our most loved organic nuts that customers keep coming back for
+            </p>
+          </div>
+          <div className="products-grid" id="popularGrid">
+            {displayProducts.map((p) => (
+              <ProductCard key={p._id} product={p} />
+            ))}
+          </div>
+          {displayProducts.length > 0 && (
+            <div style={{ textAlign: 'center', marginTop: '45px' }}>
+              <Link href="/shop" className="btn btn-primary">
+                MORE PRODUCTS
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ========== TESTIMONIALS ========== */}
+      <section className="testimonials">
+        <div className="container">
+          <div className="section-header">
+            <h2 className="section-title">What Our Customers Say</h2>
+          </div>
+          <div className="testimonials-grid">
+            {testimonials.map((t, idx) => (
+              <div key={idx} className="testimonial-card">
+                <div className="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <p className="testimonial-text">&ldquo;{t.text}&rdquo;</p>
+                <div className="testimonial-author">
+                  <div className="author-info">
+                    <h4>{t.name}</h4>
+                    <span>{t.role}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========== FEATURES ========== */}
+      <Features />
+
+      {/* ========== NEWSLETTER ========== */}
+      <Newsletter />
+
+      {/* ========== INSTAGRAM FEED ========== */}
+      <section className="instagram-feed">
+        <div className="instagram-grid">
+          {instagramImages.map((src, i) => (
+            <a
+              key={i}
+              href="https://www.instagram.com/tumanza.official/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="instagram-item"
+            >
+              <img src={src} alt={`Instagram ${i + 1}`} loading="lazy" />
+              <div className="instagram-overlay">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <rect
+                    x="2"
+                    y="2"
+                    width="20"
+                    height="20"
+                    rx="5"
+                    ry="5"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                  ></rect>
+                  <circle cx="12" cy="12" r="5" fill="none" stroke="white" strokeWidth="2"></circle>
+                  <circle cx="17.5" cy="6.5" r="1.5" fill="white"></circle>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}

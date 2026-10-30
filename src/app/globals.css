@@ -1,0 +1,57 @@
+@import './original-styles.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #541d2b;
+  --primary-dark: #3f1520;
+  --primary-light: #f6efe3;
+  --accent: #b95871;
+  --header-bg: #dfceae;
+  --black: #000000;
+  --dark: #1a1a1a;
+  --gray: #5d5b5b;
+  --gray-light: #999;
+  --white: #ffffff;
+  --off-white: #fbf7f1;
+  --font-heading: var(--font-marcellus), 'Marcellus', Georgia, serif;
+  --font-body: var(--font-opensans), 'Open Sans', Arial, sans-serif;
+  --container: 1340px;
+  --transition: 0.3s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gray);
+  background: var(--white);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
