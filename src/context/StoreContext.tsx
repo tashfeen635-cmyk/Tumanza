@@ -77,7 +77,7 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
 
   const refreshProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch('/api/products', { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
         setAllProducts(data);

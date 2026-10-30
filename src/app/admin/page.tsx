@@ -94,13 +94,13 @@ export default function AdminPage() {
 
     try {
       const [prodsRes, ordsRes, subsRes, revRes, usersRes, revsRes, anaRes] = await Promise.all([
-        fetch('/api/products'),
-        fetch('/api/orders', { headers }),
-        fetch('/api/subscribers', { headers }),
-        fetch('/api/revenue', { headers }),
-        fetch('/api/admin/users', { headers }),
-        fetch('/api/admin/reviews', { headers }),
-        fetch('/api/admin/analytics', { headers }),
+        fetch('/api/products', { cache: 'no-store' }),
+        fetch('/api/orders', { headers, cache: 'no-store' }),
+        fetch('/api/subscribers', { headers, cache: 'no-store' }),
+        fetch('/api/revenue', { headers, cache: 'no-store' }),
+        fetch('/api/admin/users', { headers, cache: 'no-store' }),
+        fetch('/api/admin/reviews', { headers, cache: 'no-store' }),
+        fetch('/api/admin/analytics', { headers, cache: 'no-store' }),
       ]);
 
       if (prodsRes.ok) setProducts(await prodsRes.json());

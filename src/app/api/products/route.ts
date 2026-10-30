@@ -3,6 +3,9 @@ import { connectDB } from '@/lib/db';
 import { Product, Review } from '@/models';
 import { requireAdmin, sanitizeProduct } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     await connectDB();
@@ -33,10 +36,17 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json(result, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      },
+    });
   } catch (err: any) {
     console.error('Get products error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error', message: err?.message || 'Database error' },
+      { status: 500 }
+    );
   }
 }
 
