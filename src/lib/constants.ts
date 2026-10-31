@@ -13,9 +13,21 @@ export const PRODUCT_CATEGORIES = [
 
 export const ORDER_STATUSES = ['Pending', 'Shipped', 'Delivered'] as const;
 
+/**
+ * NAP (Name / Address / Phone) — keep identical on footer, contact, schema & Google Business.
+ */
 export const CONTACT_INFO = {
-  address: '42 Orchard Lane, Portland, OR 97201',
-  phone: '+1 (503) 555-0192',
-  email: 'hello@tumanza.com',
-  hours: 'Mon - Fri: 9:00 AM - 6:00 PM | Sat: 10:00 AM - 4:00 PM',
+  streetAddress: '166, Street 6, Block C, Media Town',
+  address: '166, Street 6, Block C, Media Town, Islamabad, 44000',
+  city: 'Islamabad',
+  region: 'Islamabad Capital Territory',
+  postalCode: '44000',
+  country: 'PK',
+  /** Local display format */
+  phone: '0317-0885816',
+  /** E.164 for schema / tel: / WhatsApp */
+  phoneE164: '+923170885816',
+  whatsappUrl: 'https://wa.me/923170885816',
+  email: 'info@tumanza.com',
+  hours: 'Mon - Fri: 9:00 AM - 6:00 PM PKT | Sat: 10:00 AM - 4:00 PM PKT',
 };

@@ -1,4 +1,4 @@
-var CACHE_NAME = 'peaknuts-v3';
+var CACHE_NAME = 'tumanza-v1';
 var STATIC_ASSETS = [
   '/',
   '/shop',

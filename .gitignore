@@ -26,6 +26,10 @@ yarn-error.log*
 # Caches
 .turbo/
 
+# Uploaded media
+/public/uploads/*
+!/public/uploads/.gitkeep
+
 # OS and Editor metadata
 .DS_Store
 Thumbs.db

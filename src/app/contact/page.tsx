@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Features, Newsletter } from '@/components';
+import { CONTACT_INFO } from '@/lib/constants';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -51,21 +52,27 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <strong>Our Address</strong>
-                  <p>42 Orchard Lane, Portland, OR 97201</p>
+                  <p>{CONTACT_INFO.address}</p>
                 </div>
               </div>
 
-              <div className="contact-info-item">
-                <div className="contact-icon">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                  </svg>
+              {CONTACT_INFO.phone ? (
+                <div className="contact-info-item">
+                  <div className="contact-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <strong>WhatsApp</strong>
+                    <p>
+                      <a href={CONTACT_INFO.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                        {CONTACT_INFO.phone}
+                      </a>
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <strong>Phone</strong>
-                  <p>+1 (503) 555-0192</p>
-                </div>
-              </div>
+              ) : null}
 
               <div className="contact-info-item">
                 <div className="contact-icon">
@@ -76,7 +83,9 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <strong>Email</strong>
-                  <p>hello@tumanza.com</p>
+                  <p>
+                    <a href={`mailto:${CONTACT_INFO.email}`}>{CONTACT_INFO.email}</a>
+                  </p>
                 </div>
               </div>
 
@@ -89,13 +98,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <strong>Business Hours</strong>
-                  <p>
-                    Mon - Fri: 9:00 AM - 6:00 PM
-                    <br />
-                    Sat: 10:00 AM - 4:00 PM
-                    <br />
-                    Sun: Closed
-                  </p>
+                  <p>{CONTACT_INFO.hours}</p>
                 </div>
               </div>
             </div>

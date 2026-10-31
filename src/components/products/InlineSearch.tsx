@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem } from '@/lib/types';
+import { productSlug } from '@/lib/seo';
 
 export default function InlineSearch() {
-  const { allProducts, openProductModal } = useStore();
+  const router = useRouter();
+  const { allProducts } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<ProductItem[]>([]);
 
@@ -106,7 +109,7 @@ export default function InlineSearch() {
                     className="search-result-item"
                     onClick={() => {
                       setSearchTerm('');
-                      openProductModal(p);
+                      router.push(`/product/${productSlug(p)}`);
                     }}
                   >
                     <img className="search-result-img" src={searchImg} alt={p.name} loading="lazy" />

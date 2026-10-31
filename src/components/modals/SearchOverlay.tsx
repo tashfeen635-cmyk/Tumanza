@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem } from '@/lib/types';
+import { productSlug } from '@/lib/seo';
 
 export default function SearchOverlay() {
-  const { searchOpen, setSearchOpen, allProducts, openProductModal } = useStore();
+  const router = useRouter();
+  const { searchOpen, setSearchOpen, allProducts } = useStore();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -143,7 +146,7 @@ export default function SearchOverlay() {
                   className="search-result-item"
                   onClick={() => {
                     setSearchOpen(false);
-                    openProductModal(product);
+                    router.push(`/product/${productSlug(product)}`);
                   }}
                 >
                   <img className="search-result-img" src={resultImg} alt={product.name} loading="lazy" />

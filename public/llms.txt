@@ -1,0 +1,23 @@
+# Tumanza
+
+> Premium organic nuts, herbs, teas and superfoods — sourced with care and delivered across Pakistan.
+
+- Site: https://tumanza.com/
+- Shop: https://tumanza.com/shop
+- About: https://tumanza.com/about
+- Contact: https://tumanza.com/contact
+- Email: info@tumanza.com
+- WhatsApp: +92 317 0885816 (https://wa.me/923170885816)
+- Address: 166, Street 6, Block C, Media Town, Islamabad, 44000, Pakistan
+- Social: https://www.instagram.com/tumanza.official/ | https://www.facebook.com/tumanza.official/
+
+## Summary
+
+Tumanza is an online store for organic dry fruits, nuts, herbs and teas. The business is based in Islamabad, Pakistan, with product roots tied to highland organic farming (including Gilgit-Baltistan sourcing). Products are sold in PKR with delivery across Pakistan.
+
+## Key pages
+
+- /shop — full product catalog
+- /product/{slug} — individual product pages with price, stock and reviews
+- /about — brand origin story
+- /contact — NAP and enquiry form

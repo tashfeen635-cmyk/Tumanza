@@ -1,16 +1,21 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem } from '@/lib/types';
+import { productSlug } from '@/lib/seo';
 
 interface ProductCardProps {
   product: ProductItem;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { openProductModal, toggleWishlist, isInWishlist } = useStore();
+  const router = useRouter();
+  const { toggleWishlist, isInWishlist } = useStore();
   const inWishlist = isInWishlist(product._id);
+  const href = `/product/${productSlug(product)}`;
 
   const rating = product.reviewAvg != null ? Math.round(product.reviewAvg) : Math.round(product.rating || 5);
 
@@ -24,9 +29,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const starsHtml = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
 
   return (
-    <div className="product-card" onClick={() => openProductModal(product)}>
+    <article
+      className="product-card"
+      onClick={() => router.push(href)}
+      style={{ cursor: 'pointer' }}
+    >
       <div className="product-img">
-        <img src={displayImage} alt={product.name} loading="lazy" />
+        <img src={displayImage} alt={`${product.name} — buy online at Tumanza`} loading="lazy" />
         {product.badge && (
           <span className={`product-badge ${product.badge.toLowerCase()}`}>
             {product.badge}
@@ -53,20 +62,21 @@ export default function ProductCard({ product }: ProductCardProps) {
           </svg>
         </button>
         <div className="product-actions">
-          <button
-            type="button"
+          <Link
+            href={href}
             className="btn btn-primary btn-block btn-card-details"
-            onClick={(e) => {
-              e.stopPropagation();
-              openProductModal(product);
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             VIEW DETAILS
-          </button>
+          </Link>
         </div>
       </div>
       <div className="product-info">
-        <h3 className="product-name">{product.name}</h3>
+        <h3 className="product-name">
+          <Link href={href} onClick={(e) => e.stopPropagation()} style={{ color: 'inherit', textDecoration: 'none' }}>
+            {product.name}
+          </Link>
+        </h3>
         {product.urduName && <span className="product-name-urdu">{product.urduName}</span>}
         {product.description && <p className="product-desc">{product.description}</p>}
         <div className="product-rating">
@@ -82,6 +92,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="price-current">Rs.{product.price.toFixed(2)}</span>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

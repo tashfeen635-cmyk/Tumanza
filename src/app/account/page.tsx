@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { OrderRecord } from '@/lib/types';
+import { productSlug } from '@/lib/seo';
 
 function AccountContent() {
   const searchParams = useSearchParams();
-  const { user, token, setUserAuth, logout, openProductModal, allProducts, wishlist, toggleWishlist } =
+  const { user, token, setUserAuth, logout, allProducts, wishlist, toggleWishlist } =
     useStore();
 
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
@@ -376,9 +377,9 @@ function AccountContent() {
                           <span style={{ fontSize: '13px', color: 'var(--primary)' }}>Rs.{p.price.toFixed(2)}</span>
                         </div>
                         <div style={{ display: 'flex', gap: '8px' }}>
-                          <button type="button" className="btn btn-primary" style={{ padding: '6px 16px', fontSize: '11px' }} onClick={() => openProductModal(p)}>
+                          <Link href={`/product/${productSlug(p)}`} className="btn btn-primary" style={{ padding: '6px 16px', fontSize: '11px' }}>
                             VIEW
-                          </button>
+                          </Link>
                           <button type="button" className="btn btn-outline" style={{ padding: '6px 12px', fontSize: '11px' }} onClick={() => toggleWishlist(p._id)}>
                             REMOVE
                           </button>

@@ -22,6 +22,8 @@ import {
   AlertCircle,
   X,
   RefreshCw,
+  Upload,
+  Loader2,
 } from 'lucide-react';
 import { ProductItem, OrderRecord, SubscriberRecord } from '@/lib/types';
 
@@ -71,6 +73,8 @@ export default function AdminPage() {
   });
 
   const [viewingOrder, setViewingOrder] = useState<OrderRecord | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
 
   // Initial token check
   useEffect(() => {
@@ -170,6 +174,8 @@ export default function AdminPage() {
       rating: 5,
       description: '',
     });
+    setShowUrlInput(false);
+    setUploadingImage(false);
     setProductModalOpen(true);
   };
 
@@ -188,7 +194,50 @@ export default function AdminPage() {
       rating: p.rating || 5,
       description: p.description || '',
     });
+    setShowUrlInput(false);
+    setUploadingImage(false);
     setProductModalOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file (JPG, PNG, WebP, etc.)');
+      return;
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+      alert('Image file size must be less than 15MB');
+      return;
+    }
+
+    setUploadingImage(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProdFormData((prev) => ({ ...prev, image: data.url }));
+      } else {
+        alert(data.error || 'Failed to upload image');
+      }
+    } catch {
+      alert('Network error while uploading image');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -1167,14 +1216,93 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Image URL / Path</label>
-                <input
-                  type="text"
-                  value={prodFormData.image}
-                  onChange={(e) => setProdFormData({ ...prodFormData, image: e.target.value })}
-                  placeholder="/images/shilajit.png or image URL"
-                  className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
-                />
+                <label className="block font-semibold text-gray-700 mb-1">Product Image</label>
+
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-brand-charcoal transition-colors bg-gray-50/60">
+                  {prodFormData.image ? (
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm flex items-center justify-center">
+                        <img
+                          src={prodFormData.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/images/product-pack.jpg';
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <label className="cursor-pointer px-3 py-1.5 bg-brand-charcoal text-white text-xs font-semibold rounded hover:bg-black transition-colors">
+                          Change Image
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                            disabled={uploadingImage}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setProdFormData({ ...prodFormData, image: '' })}
+                          className="px-3 py-1.5 border border-red-300 text-red-600 text-xs font-semibold rounded hover:bg-red-50 transition-colors"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      {uploadingImage ? (
+                        <div className="py-6 flex flex-col items-center justify-center">
+                          <Loader2 className="w-8 h-8 text-brand-charcoal animate-spin mb-2" />
+                          <span className="text-xs text-gray-600 font-medium">Uploading image...</span>
+                        </div>
+                      ) : (
+                        <label className="cursor-pointer block py-4">
+                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                          <span className="text-xs font-bold text-brand-charcoal block">
+                            Click to upload from laptop or mobile
+                          </span>
+                          <span className="text-[11px] text-gray-400 block mt-1">
+                            Gallery / camera · PNG, JPG, WebP (up to 15MB)
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageUpload}
+                          />
+                        </label>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-2 flex items-center justify-between text-[11px]">
+                  <span className="text-gray-400 truncate max-w-[200px]">
+                    {prodFormData.image ? `Path: ${prodFormData.image}` : 'No image selected'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput(!showUrlInput)}
+                    className="text-gray-500 hover:text-brand-charcoal underline ml-2 whitespace-nowrap"
+                  >
+                    {showUrlInput ? 'Hide manual URL' : 'Or paste URL manually'}
+                  </button>
+                </div>
+
+                {showUrlInput && (
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      value={prodFormData.image}
+                      onChange={(e) => setProdFormData({ ...prodFormData, image: e.target.value })}
+                      placeholder="/images/product-pack.jpg or https://..."
+                      className="w-full p-2 text-xs rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
