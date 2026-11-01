@@ -56,6 +56,13 @@ export default function ShopPage() {
       });
     } else if (sortBy === 'name') {
       list.sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      list.sort((a, b) => {
+        const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
+        const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
+        if (soA !== soB) return soA - soB;
+        return a._id.localeCompare(b._id);
+      });
     }
 
     return list;
@@ -191,7 +198,7 @@ export default function ShopPage() {
               minWidth: '150px',
             }}
           >
-            <option value="">Sort By</option>
+            <option value="">Featured / Priority Order</option>
             <option value="price-low">Price: Low to High</option>
             <option value="price-high">Price: High to Low</option>
             <option value="rating">Highest Rated</option>

@@ -36,10 +36,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Limit to 15MB
-    const MAX_SIZE = 15 * 1024 * 1024;
+    // Limit to 4MB
+    const MAX_SIZE = 4 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File size exceeds 15MB limit' }, { status: 400 });
+      return NextResponse.json({ error: 'File size exceeds 4MB limit' }, { status: 400 });
     }
 
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');

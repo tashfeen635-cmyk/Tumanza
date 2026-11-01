@@ -70,6 +70,7 @@ export default function AdminPage() {
     badge: '',
     rating: 5,
     description: '',
+    sortOrder: 0,
   });
 
   const [viewingOrder, setViewingOrder] = useState<OrderRecord | null>(null);
@@ -173,6 +174,7 @@ export default function AdminPage() {
       badge: '',
       rating: 5,
       description: '',
+      sortOrder: 0,
     });
     setShowUrlInput(false);
     setUploadingImage(false);
@@ -193,6 +195,7 @@ export default function AdminPage() {
       badge: p.badge || '',
       rating: p.rating || 5,
       description: p.description || '',
+      sortOrder: p.sortOrder || 0,
     });
     setShowUrlInput(false);
     setUploadingImage(false);
@@ -208,8 +211,8 @@ export default function AdminPage() {
       return;
     }
 
-    if (file.size > 15 * 1024 * 1024) {
-      alert('Image file size must be less than 15MB');
+    if (file.size > 4 * 1024 * 1024) {
+      alert('Image file size must be less than 4MB');
       return;
     }
 
@@ -226,14 +229,24 @@ export default function AdminPage() {
         body: formData,
       });
 
-      const data = await res.json();
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        if (res.status === 413) {
+          throw new Error('Image file is too large (maximum size is 4MB). Please choose a smaller image.');
+        }
+        throw new Error(text || `Server error (${res.status})`);
+      }
+
       if (res.ok && data.url) {
         setProdFormData((prev) => ({ ...prev, image: data.url }));
       } else {
-        alert(data.error || 'Failed to upload image');
+        alert(data.error || data.message || 'Failed to upload image');
       }
-    } catch {
-      alert('Network error while uploading image');
+    } catch (err: any) {
+      alert(err?.message || 'Network error while uploading image');
     } finally {
       setUploadingImage(false);
       e.target.value = '';
@@ -693,6 +706,7 @@ export default function AdminPage() {
                       <th className="p-3">Stock</th>
                       <th className="p-3">Badge</th>
                       <th className="p-3">Rating</th>
+                      <th className="p-3">Order</th>
                       <th className="p-3 text-right">Actions</th>
                     </tr>
                   </thead>
@@ -752,6 +766,7 @@ export default function AdminPage() {
                           )}
                         </td>
                         <td className="p-3 text-amber-500 font-semibold">{p.rating} ★</td>
+                        <td className="p-3 text-gray-600 font-medium">{p.sortOrder ?? 0}</td>
                         <td className="p-3 text-right space-x-2">
                           <button
                             onClick={() => openEditProductModal(p)}
@@ -1190,7 +1205,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block font-semibold text-gray-700 mb-1">Badge (e.g. SALE, HOT)</label>
                   <input
@@ -1209,6 +1224,17 @@ export default function AdminPage() {
                     value={prodFormData.rating}
                     onChange={(e) =>
                       setProdFormData({ ...prodFormData, rating: parseInt(e.target.value) || 5 })
+                    }
+                    className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Sort Order</label>
+                  <input
+                    type="number"
+                    value={prodFormData.sortOrder}
+                    onChange={(e) =>
+                      setProdFormData({ ...prodFormData, sortOrder: parseInt(e.target.value) || 0 })
                     }
                     className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
                   />

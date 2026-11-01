@@ -12,6 +12,7 @@ export interface IProduct extends Document {
   rating: number;
   description: string;
   urduName: string;
+  sortOrder: number;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -26,6 +27,7 @@ const productSchema = new Schema<IProduct>({
   rating: { type: Number, default: 5 },
   description: { type: String, default: '' },
   urduName: { type: String, default: '' },
+  sortOrder: { type: Number, default: 0 },
 });
 
 export const Product: Model<IProduct> =

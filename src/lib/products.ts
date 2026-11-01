@@ -20,6 +20,7 @@ function mapProduct(p: any, statsMap: Record<string, { avg: number; count: numbe
     rating: p.rating || 5,
     description: p.description || '',
     urduName: p.urduName || '',
+    sortOrder: p.sortOrder || 0,
     reviewAvg: stat ? Math.round(stat.avg * 10) / 10 : null,
     reviewCount: stat ? stat.count : 0,
   };
@@ -40,7 +41,14 @@ export async function getAllProducts(): Promise<ProductItem[]> {
   await connectDB();
   const products = await Product.find().lean();
   const statsMap = await getReviewStatsMap();
-  return products.map((p: any) => mapProduct(p, statsMap));
+  const mapped = products.map((p: any) => mapProduct(p, statsMap));
+  mapped.sort((a, b) => {
+    const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
+    const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
+    if (soA !== soB) return soA - soB;
+    return a._id.localeCompare(b._id);
+  });
+  return mapped;
 }
 
 export async function getProductById(id: string): Promise<ProductItem | null> {

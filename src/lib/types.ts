@@ -11,6 +11,7 @@ export interface ProductItem {
   rating: number;
   description: string;
   urduName: string;
+  sortOrder?: number;
   reviewAvg?: number | null;
   reviewCount?: number;
 }

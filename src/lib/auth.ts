@@ -55,6 +55,7 @@ export function sanitizeProduct(body: any) {
   const price = Number(body.price);
   const oldPrice = Number(body.oldPrice);
   const rating = Number(body.rating);
+  const sortOrder = Number(body.sortOrder);
   return {
     name: cleanStr(body.name, 200),
     category: cleanStr(body.category, 120),
@@ -67,6 +68,7 @@ export function sanitizeProduct(body: any) {
     rating: Number.isFinite(rating) && rating >= 1 && rating <= 5 ? rating : 5,
     description: cleanStr(body.description, 2000),
     urduName: cleanStr(body.urduName, 200),
+    sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
   };
 }
 

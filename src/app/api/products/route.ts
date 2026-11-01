@@ -9,7 +9,7 @@ export const revalidate = 0;
 export async function GET() {
   try {
     await connectDB();
-    const products = await Product.find().lean();
+    const products = await Product.find().sort({ sortOrder: 1, _id: 1 }).lean();
 
     const reviewStats = await Review.aggregate([
       { $group: { _id: '$productId', avg: { $avg: '$rating' }, count: { $sum: 1 } } },
@@ -34,6 +34,13 @@ export async function GET() {
         reviewAvg: stat ? Math.round(stat.avg * 10) / 10 : null,
         reviewCount: stat ? stat.count : 0,
       };
+    });
+
+    result.sort((a: any, b: any) => {
+      const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
+      const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
+      if (soA !== soB) return soA - soB;
+      return String(a._id).localeCompare(String(b._id));
     });
 
     return NextResponse.json(result, {
