@@ -102,8 +102,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${marcellus.variable} ${openSans.variable}`}>
-      <body>
+    <html lang="en" className={`${marcellus.variable} ${openSans.variable}`} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <JsonLd data={organizationJsonLd()} />
         <StoreProvider>
           <Header />
