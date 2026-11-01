@@ -66,16 +66,21 @@ export default function AdminPage() {
     oldPrice: 0,
     stock: 'In Stock',
     image: '',
+    gallery1: '',
+    gallery2: '',
     section: 'popular',
     badge: '',
     rating: 5,
     description: '',
     sortOrder: 0,
+    specifications: '',
+    benefits: '',
+    shippingInfo: '',
+    returnPolicy: '',
   });
 
   const [viewingOrder, setViewingOrder] = useState<OrderRecord | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [showUrlInput, setShowUrlInput] = useState(false);
 
   // Initial token check
   useEffect(() => {
@@ -170,13 +175,18 @@ export default function AdminPage() {
       oldPrice: 0,
       stock: 'In Stock',
       image: '',
+      gallery1: '',
+      gallery2: '',
       section: 'popular',
       badge: '',
       rating: 5,
       description: '',
       sortOrder: 0,
+      specifications: '',
+      benefits: '',
+      shippingInfo: '',
+      returnPolicy: '',
     });
-    setShowUrlInput(false);
     setUploadingImage(false);
     setProductModalOpen(true);
   };
@@ -191,18 +201,26 @@ export default function AdminPage() {
       oldPrice: p.oldPrice || 0,
       stock: p.stock || 'In Stock',
       image: p.image || '',
+      gallery1: p.images?.[0] || '',
+      gallery2: p.images?.[1] || '',
       section: p.section || '',
       badge: p.badge || '',
       rating: p.rating || 5,
       description: p.description || '',
       sortOrder: p.sortOrder || 0,
+      specifications: p.specifications || '',
+      benefits: p.benefits || '',
+      shippingInfo: p.shippingInfo || '',
+      returnPolicy: p.returnPolicy || '',
     });
-    setShowUrlInput(false);
     setUploadingImage(false);
     setProductModalOpen(true);
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFieldImageUpload = async (
+    field: 'image' | 'gallery1' | 'gallery2',
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -241,7 +259,7 @@ export default function AdminPage() {
       }
 
       if (res.ok && data.url) {
-        setProdFormData((prev) => ({ ...prev, image: data.url }));
+        setProdFormData((prev) => ({ ...prev, [field]: data.url }));
       } else {
         alert(data.error || data.message || 'Failed to upload image');
       }
@@ -260,6 +278,11 @@ export default function AdminPage() {
     const url = editingProduct ? `/api/products/${editingProduct._id}` : '/api/products';
     const method = editingProduct ? 'PUT' : 'POST';
 
+    const payload = {
+      ...prodFormData,
+      images: [prodFormData.gallery1, prodFormData.gallery2].filter(Boolean),
+    };
+
     try {
       const res = await fetch(url, {
         method,
@@ -267,7 +290,7 @@ export default function AdminPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${adminToken}`,
         },
-        body: JSON.stringify(prodFormData),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -1242,93 +1265,68 @@ export default function AdminPage() {
               </div>
 
               <div>
-                <label className="block font-semibold text-gray-700 mb-1">Product Image</label>
-
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-brand-charcoal transition-colors bg-gray-50/60">
-                  {prodFormData.image ? (
-                    <div className="flex flex-col items-center">
-                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border border-gray-200 mb-3 bg-white shadow-sm flex items-center justify-center">
-                        <img
-                          src={prodFormData.image}
-                          alt="Preview"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/images/product-pack.jpg';
-                          }}
-                        />
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <label className="cursor-pointer px-3 py-1.5 bg-brand-charcoal text-white text-xs font-semibold rounded hover:bg-black transition-colors">
-                          Change Image
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageUpload}
-                            disabled={uploadingImage}
-                          />
+                <label className="block font-semibold text-gray-700 mb-2">Product Images (3 Separate Images)</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Slot 1: Main Image */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center bg-gray-50">
+                    <span className="block text-[11px] font-bold text-gray-700 mb-2">1. Main Cover Image</span>
+                    {prodFormData.image ? (
+                      <div className="flex flex-col items-center">
+                        <img src={prodFormData.image} alt="Main" className="w-20 h-20 object-cover rounded-md mb-2 border" />
+                        <label className="cursor-pointer text-[10px] bg-brand-charcoal text-white px-2 py-1 rounded font-semibold">
+                          Change
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFieldImageUpload('image', e)} />
                         </label>
-                        <button
-                          type="button"
-                          onClick={() => setProdFormData({ ...prodFormData, image: '' })}
-                          className="px-3 py-1.5 border border-red-300 text-red-600 text-xs font-semibold rounded hover:bg-red-50 transition-colors"
-                        >
-                          Remove
-                        </button>
                       </div>
-                    </div>
-                  ) : (
-                    <div>
-                      {uploadingImage ? (
-                        <div className="py-6 flex flex-col items-center justify-center">
-                          <Loader2 className="w-8 h-8 text-brand-charcoal animate-spin mb-2" />
-                          <span className="text-xs text-gray-600 font-medium">Uploading image...</span>
-                        </div>
-                      ) : (
-                        <label className="cursor-pointer block py-4">
-                          <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                          <span className="text-xs font-bold text-brand-charcoal block">
-                            Click to upload from laptop or mobile
-                          </span>
-                          <span className="text-[11px] text-gray-400 block mt-1">
-                            Gallery / camera · PNG, JPG, WebP (up to 15MB)
-                          </span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageUpload}
-                          />
-                        </label>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className="mt-2 flex items-center justify-between text-[11px]">
-                  <span className="text-gray-400 truncate max-w-[200px]">
-                    {prodFormData.image ? `Path: ${prodFormData.image}` : 'No image selected'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowUrlInput(!showUrlInput)}
-                    className="text-gray-500 hover:text-brand-charcoal underline ml-2 whitespace-nowrap"
-                  >
-                    {showUrlInput ? 'Hide manual URL' : 'Or paste URL manually'}
-                  </button>
-                </div>
-
-                {showUrlInput && (
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      value={prodFormData.image}
-                      onChange={(e) => setProdFormData({ ...prodFormData, image: e.target.value })}
-                      placeholder="/images/product-pack.jpg or https://..."
-                      className="w-full p-2 text-xs rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
-                    />
+                    ) : (
+                      <label className="cursor-pointer block py-2">
+                        <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                        <span className="text-[10px] font-bold text-gray-700 block">Upload Main</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFieldImageUpload('image', e)} />
+                      </label>
+                    )}
                   </div>
-                )}
+
+                  {/* Slot 2: Gallery 1 */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center bg-gray-50">
+                    <span className="block text-[11px] font-bold text-gray-700 mb-2">2. Gallery Image 2</span>
+                    {prodFormData.gallery1 ? (
+                      <div className="flex flex-col items-center">
+                        <img src={prodFormData.gallery1} alt="Gallery 1" className="w-20 h-20 object-cover rounded-md mb-2 border" />
+                        <label className="cursor-pointer text-[10px] bg-brand-charcoal text-white px-2 py-1 rounded font-semibold">
+                          Change
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFieldImageUpload('gallery1', e)} />
+                        </label>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer block py-2">
+                        <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                        <span className="text-[10px] font-bold text-gray-700 block">Upload Photo 2</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFieldImageUpload('gallery1', e)} />
+                      </label>
+                    )}
+                  </div>
+
+                  {/* Slot 3: Gallery 2 */}
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 text-center bg-gray-50">
+                    <span className="block text-[11px] font-bold text-gray-700 mb-2">3. Gallery Image 3</span>
+                    {prodFormData.gallery2 ? (
+                      <div className="flex flex-col items-center">
+                        <img src={prodFormData.gallery2} alt="Gallery 2" className="w-20 h-20 object-cover rounded-md mb-2 border" />
+                        <label className="cursor-pointer text-[10px] bg-brand-charcoal text-white px-2 py-1 rounded font-semibold">
+                          Change
+                          <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFieldImageUpload('gallery2', e)} />
+                        </label>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer block py-2">
+                        <Upload className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                        <span className="text-[10px] font-bold text-gray-700 block">Upload Photo 3</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleFieldImageUpload('gallery2', e)} />
+                      </label>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -1341,6 +1339,54 @@ export default function AdminPage() {
                   }
                   className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
                 />
+              </div>
+
+
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Specifications</label>
+                  <textarea
+                    rows={2}
+                    value={prodFormData.specifications}
+                    onChange={(e) => setProdFormData({ ...prodFormData, specifications: e.target.value })}
+                    placeholder="Size, origin, weight, packaging..."
+                    className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Key Benefits</label>
+                  <textarea
+                    rows={2}
+                    value={prodFormData.benefits}
+                    onChange={(e) => setProdFormData({ ...prodFormData, benefits: e.target.value })}
+                    placeholder="Health perks, purity..."
+                    className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Shipping Info</label>
+                  <input
+                    type="text"
+                    value={prodFormData.shippingInfo}
+                    onChange={(e) => setProdFormData({ ...prodFormData, shippingInfo: e.target.value })}
+                    placeholder="Fast Nationwide Delivery..."
+                    className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-700 mb-1">Return Policy</label>
+                  <input
+                    type="text"
+                    value={prodFormData.returnPolicy}
+                    onChange={(e) => setProdFormData({ ...prodFormData, returnPolicy: e.target.value })}
+                    placeholder="48-hour replacement..."
+                    className="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                  />
+                </div>
               </div>
 
               <button

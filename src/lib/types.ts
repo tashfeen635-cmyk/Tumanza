@@ -5,6 +5,7 @@ export interface ProductItem {
   price: number;
   stock: string;
   image: string;
+  images?: string[];
   section: string;
   badge: string;
   oldPrice: number;
@@ -14,6 +15,10 @@ export interface ProductItem {
   sortOrder?: number;
   reviewAvg?: number | null;
   reviewCount?: number;
+  specifications?: string;
+  benefits?: string;
+  shippingInfo?: string;
+  returnPolicy?: string;
 }
 
 export interface OrderItem {

@@ -13,14 +13,9 @@ import {
 export default function HomePage() {
   const { allProducts } = useStore();
 
-  const popularProducts = allProducts
-    .filter((p) => p.section === 'popular')
-    .sort((a, b) => {
-      const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
-      const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
-      if (soA !== soB) return soA - soB;
-      return a._id.localeCompare(b._id);
-    });
+  const popularProducts = allProducts.filter(
+    (p) => !p.section || p.section === 'popular' || p.section === 'trending' || p.section === 'bestselling'
+  );
   const baseProducts = popularProducts.length > 0 ? popularProducts : allProducts;
   const displayProducts = baseProducts.slice(0, 6);
 

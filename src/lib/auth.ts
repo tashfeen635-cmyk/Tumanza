@@ -56,12 +56,21 @@ export function sanitizeProduct(body: any) {
   const oldPrice = Number(body.oldPrice);
   const rating = Number(body.rating);
   const sortOrder = Number(body.sortOrder);
+  let images = body.images;
+  if (Array.isArray(images)) {
+    images = images.map((s: any) => cleanStr(String(s).trim(), 1000)).filter(Boolean);
+  } else if (typeof images === 'string') {
+    images = images.split(',').map((s: string) => cleanStr(s.trim(), 1000)).filter(Boolean);
+  } else {
+    images = [];
+  }
   return {
     name: cleanStr(body.name, 200),
     category: cleanStr(body.category, 120),
     price: Number.isFinite(price) && price >= 0 ? price : 0,
     stock: cleanStr(body.stock, 60) || 'In Stock',
     image: cleanStr(body.image, 1000),
+    images,
     section: cleanStr(body.section, 60),
     badge: cleanStr(body.badge, 30),
     oldPrice: Number.isFinite(oldPrice) && oldPrice >= 0 ? oldPrice : 0,
@@ -69,6 +78,10 @@ export function sanitizeProduct(body: any) {
     description: cleanStr(body.description, 2000),
     urduName: cleanStr(body.urduName, 200),
     sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
+    specifications: cleanStr(body.specifications, 2000),
+    benefits: cleanStr(body.benefits, 2000),
+    shippingInfo: cleanStr(body.shippingInfo, 2000),
+    returnPolicy: cleanStr(body.returnPolicy, 2000),
   };
 }
 

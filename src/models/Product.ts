@@ -6,6 +6,7 @@ export interface IProduct extends Document {
   price: number;
   stock: string;
   image: string;
+  images: string[];
   section: string;
   badge: string;
   oldPrice: number;
@@ -13,6 +14,10 @@ export interface IProduct extends Document {
   description: string;
   urduName: string;
   sortOrder: number;
+  specifications: string;
+  benefits: string;
+  shippingInfo: string;
+  returnPolicy: string;
 }
 
 const productSchema = new Schema<IProduct>({
@@ -21,6 +26,7 @@ const productSchema = new Schema<IProduct>({
   price: { type: Number, required: true },
   stock: { type: String, required: true },
   image: { type: String, default: '' },
+  images: { type: [String], default: [] },
   section: { type: String, default: '' },
   badge: { type: String, default: '' },
   oldPrice: { type: Number, default: 0 },
@@ -28,6 +34,10 @@ const productSchema = new Schema<IProduct>({
   description: { type: String, default: '' },
   urduName: { type: String, default: '' },
   sortOrder: { type: Number, default: 0 },
+  specifications: { type: String, default: '' },
+  benefits: { type: String, default: '' },
+  shippingInfo: { type: String, default: '' },
+  returnPolicy: { type: String, default: '' },
 });
 
 export const Product: Model<IProduct> =
