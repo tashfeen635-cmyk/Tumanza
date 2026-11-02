@@ -31,9 +31,8 @@ def main() -> int:
             print('ERR:', err[-1500:] if len(err) > 1500 else err)
         return code
 
-    # 1. Backup .env and public/uploads
+    # 1. Backup public/uploads
     run('mkdir -p /tmp/tumanza_backup')
-    run(f'cp -f {REMOTE_APP}/.env /tmp/tumanza_backup/.env 2>/dev/null || true')
     run(f'cp -rf {REMOTE_APP}/public/uploads /tmp/tumanza_backup/uploads 2>/dev/null || true')
 
     # Fix git repo ownership and pull latest main (remove conflicting untracked files)
@@ -44,8 +43,15 @@ def main() -> int:
         print('Git pull failed, trying force checkout...')
         run(f'cd {REMOTE_APP} && git fetch origin main && git reset --hard origin/main')
 
-    # Restore .env and public/uploads
-    run(f'cp -f /tmp/tumanza_backup/.env {REMOTE_APP}/.env 2>/dev/null || true')
+    # Upload local .env to remote server
+    local_env_path = ROOT / '.env'
+    if local_env_path.exists():
+        print('Uploading local .env to remote server...')
+        sftp = client.open_sftp()
+        sftp.put(str(local_env_path), f'{REMOTE_APP}/.env')
+        sftp.close()
+
+    # Restore public/uploads
     run(f'mkdir -p {REMOTE_APP}/public')
     run(f'cp -rf /tmp/tumanza_backup/uploads {REMOTE_APP}/public/uploads 2>/dev/null || true')
     run(f'chown -R tumanza:tumanza {REMOTE_APP}')
