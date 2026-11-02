@@ -103,19 +103,20 @@ export default function ProductDetailClient({ product }: Props) {
     <div className="product-detail-page bg-[#fbf7f1] min-h-screen pt-28 pb-16">
       <div className="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Go Back Button */}
-        <div className="mb-6">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#541d2b] bg-white hover:bg-[#541d2b] hover:text-[#dfceae] px-4 py-2 rounded-xl border border-[#eadaad]/60 transition-all shadow-xs"
-          >
-            <span>&larr;</span> Go Back
-          </button>
-        </div>
-
         {/* Main Product Section: Two Column Layout */}
-        <div className="bg-white rounded-2xl shadow-sm border border-[#eadaad]/40 p-6 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+        <div className="bg-white rounded-2xl shadow-sm border border-[#eadaad]/40 p-6 sm:p-10 lg:p-12">
+          {/* Top Left Go Back Button */}
+          <div className="mb-8">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[#541d2b] bg-[#fbf7f1] hover:bg-[#541d2b] hover:text-[#dfceae] px-4 py-2 rounded-xl border border-[#eadaad]/60 transition-all shadow-xs"
+            >
+              <span>&larr;</span> Go Back
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
            {/* Left Column: Product Gallery (55% -> col-span-7) */}
           <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4 items-start sticky top-28">
@@ -492,6 +493,7 @@ export default function ProductDetailClient({ product }: Props) {
 
           </div>
         </div>
+      </div>
 
       </div>
 
