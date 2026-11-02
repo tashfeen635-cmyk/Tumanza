@@ -35,7 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       style={{ cursor: 'pointer' }}
     >
       <div className="product-img">
-        <img src={displayImage} alt={`${product.name} — buy online at Tumanza`} loading="lazy" />
+        <img src={displayImage} alt={`${product.name} — buy online at Tumanza`} fetchPriority="high" />
         {product.badge && (
           <span className={`product-badge ${product.badge.toLowerCase()}`}>
             {product.badge}

@@ -156,6 +156,7 @@ export default function ProductDetailClient({ product }: Props) {
                 <img
                   src={currentImage}
                   alt={product.name}
+                  fetchPriority="high"
                   className="max-h-[460px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 p-6"
                 />
               </button>
