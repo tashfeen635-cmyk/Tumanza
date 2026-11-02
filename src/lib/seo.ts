@@ -78,8 +78,11 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
 }
 
 export function productJsonLd(product: ProductItem) {
-  const imagePath = resolveProductImage(product);
-  const imageUrl = imagePath.startsWith('http') ? imagePath : absoluteUrl(imagePath);
+  const mainImg = resolveProductImage(product);
+  const extraImgs = Array.isArray(product.images) ? product.images : [];
+  const allImgs = Array.from(new Set([mainImg, ...extraImgs].filter(Boolean)));
+  const imageUrls = allImgs.map((img) => (img.startsWith('http') ? img : absoluteUrl(img)));
+
   const url = absoluteUrl(`/product/${productSlug(product)}`);
   const ratingValue =
     product.reviewAvg != null ? product.reviewAvg : product.rating || undefined;
@@ -92,7 +95,7 @@ export function productJsonLd(product: ProductItem) {
     description:
       product.description ||
       `${product.name} — premium organic product from Tumanza, sourced for Pakistan families.`,
-    image: [imageUrl],
+    image: imageUrls,
     sku: String(product._id),
     brand: {
       '@type': 'Brand',

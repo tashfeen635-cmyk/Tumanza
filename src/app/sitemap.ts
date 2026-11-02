@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getAllProducts } from '@/lib/products';
-import { productSlug } from '@/lib/seo';
+import { productSlug, resolveProductImage } from '@/lib/seo';
 import { absoluteUrl } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
@@ -38,12 +38,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let productRoutes: MetadataRoute.Sitemap = [];
   try {
     const products = await getAllProducts();
-    productRoutes = products.map((p) => ({
-      url: absoluteUrl(`/product/${productSlug(p)}`),
-      lastModified: now,
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
+    productRoutes = products.map((p) => {
+      const mainImg = resolveProductImage(p);
+      const extraImgs = Array.isArray(p.images) ? p.images : [];
+      const rawImgs = Array.from(new Set([mainImg, ...extraImgs].filter(Boolean)));
+      const images = rawImgs.map((img) => (img.startsWith('http') ? img : absoluteUrl(img)));
+
+      return {
+        url: absoluteUrl(`/product/${productSlug(p)}`),
+        lastModified: now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+        images,
+      };
+    });
   } catch (err) {
     console.error('Sitemap product fetch failed:', err);
   }

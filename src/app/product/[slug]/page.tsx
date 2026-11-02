@@ -22,7 +22,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     product.description?.slice(0, 155) ||
     `Buy ${product.name} online from Tumanza — organic ${product.category.toLowerCase()} from Gilgit-Baltistan, delivered across Pakistan.`;
-  const image = resolveProductImage(product);
+  const mainImg = resolveProductImage(product);
+  const extraImgs = Array.isArray(product.images) ? product.images : [];
+  const allImgs = Array.from(new Set([mainImg, ...extraImgs].filter(Boolean)));
+  const imageObjects = allImgs.map((img) => ({
+    url: img.startsWith('http') ? img : absoluteUrl(img),
+    alt: product.name,
+  }));
 
   return {
     title,
@@ -33,13 +39,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: absoluteUrl(path),
       type: 'website',
-      images: [{ url: image, alt: product.name }],
+      images: imageObjects,
     },
     twitter: {
       card: 'summary_large_image',
       title: `${product.name} | Tumanza`,
       description,
-      images: [image],
+      images: imageObjects.map((io) => io.url),
     },
   };
 }
