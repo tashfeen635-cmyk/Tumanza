@@ -446,6 +446,8 @@ export default function AdminPage() {
 
           <Link
             href="/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block mt-6 text-xs text-gray-400 hover:text-brand-charcoal"
           >
             &larr; Back to Public Store
@@ -527,6 +529,8 @@ export default function AdminPage() {
           </button>
           <Link
             href="/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="w-full flex items-center space-x-2 text-xs text-gray-400 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5"
           >
             <Store className="w-4 h-4" />
