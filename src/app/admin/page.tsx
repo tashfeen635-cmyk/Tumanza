@@ -399,7 +399,7 @@ export default function AdminPage() {
   if (!adminToken) {
     /* ================= LOGIN SCREEN ================= */
     return (
-      <div className="min-h-screen bg-brand-charcoal flex items-center justify-center p-4">
+      <div className="min-h-screen bg-brand-charcoal flex items-center justify-center p-4" suppressHydrationWarning>
         <div className="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl border border-white/10 text-center">
           <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Tumanza Admin</h1>
           <p className="text-xs text-gray-500 mt-1 mb-6">Enter your management credentials</p>
@@ -457,7 +457,7 @@ export default function AdminPage() {
 
   /* ================= AUTHENTICATED ADMIN DASHBOARD ================= */
   return (
-    <div className="min-h-screen bg-[#f4f5f7] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#f4f5f7] flex flex-col md:flex-row" suppressHydrationWarning>
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-brand-charcoal text-gray-300 flex flex-col flex-shrink-0">
         <div className="p-6 border-b border-white/10 flex items-center justify-between">
