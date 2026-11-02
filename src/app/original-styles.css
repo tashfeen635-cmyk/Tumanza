@@ -804,6 +804,7 @@ header {
   position: relative;
   margin-top: 90px;
   min-height: 90vh;
+  background-color: #3f1520;
   background-image: url("/img/hero.jpg");
   background-position: right center;
   background-size: cover;
