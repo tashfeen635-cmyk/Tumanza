@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Product } from '@/models';
@@ -36,6 +37,9 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    revalidatePath('/');
+    revalidatePath('/shop');
+    revalidatePath('/product/[slug]', 'page');
     return NextResponse.json(product);
   } catch (err: any) {
     console.error('Update product error:', err);
@@ -65,6 +69,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
+    revalidatePath('/');
+    revalidatePath('/shop');
+    revalidatePath('/product/[slug]', 'page');
     return NextResponse.json({ message: 'Deleted' });
   } catch (err: any) {
     console.error('Delete product error:', err);

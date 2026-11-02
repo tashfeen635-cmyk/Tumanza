@@ -27,13 +27,13 @@ export default function ProductDetailClient({ product }: Props) {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewMessage, setReviewMessage] = useState<{ text: string; error?: boolean } | null>(null);
 
-  // Gallery images (main + admin managed gallery images)
+  // Gallery images (de-duplicated main + gallery images)
   const mainImg = resolveProductImage(product);
-  const extraImages = product.images && product.images.length > 0 ? product.images : [];
-  const images = [mainImg, ...extraImages];
-  if (images.length === 1) {
-    images.push(mainImg, mainImg); // ensure thumbnails work smoothly
-  }
+  const images = Array.from(
+    new Set([mainImg, ...(product.images ?? [])].filter(Boolean))
+  ) as string[];
+  const hasGallery = images.length > 1;
+  const currentImage = images[activeImageIndex] ?? images[0] ?? mainImg;
 
   const rating = avgRating != null ? Math.round(avgRating) : Math.round(product.rating || 5);
   const starsString =
@@ -117,24 +117,26 @@ export default function ProductDetailClient({ product }: Props) {
         {/* Main Product Section: Two Column Layout */}
         <div className="bg-white rounded-2xl shadow-sm border border-[#eadaad]/40 p-6 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
-          {/* Left Column: Product Gallery (55% -> col-span-7) */}
+           {/* Left Column: Product Gallery (55% -> col-span-7) */}
           <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4 items-start sticky top-28">
             
-            {/* Thumbnails */}
-            <div className="flex sm:flex-col gap-3 order-2 sm:order-1 w-full sm:w-24 overflow-x-auto sm:overflow-y-auto max-h-[500px] shrink-0 pb-2 sm:pb-0">
-              {images.map((img, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-[#fbf7f1] ${
-                    activeImageIndex === idx ? 'border-[#541d2b] shadow-md ring-2 ring-[#dfceae]/50' : 'border-[#eadaad]/60 opacity-80 hover:opacity-100'
-                  }`}
-                >
-                  <img src={img} alt={`${product.name} thumbnail ${idx + 1}`} className="w-full h-full object-contain p-2" />
-                </button>
-              ))}
-            </div>
+            {/* Thumbnails (rendered only if multiple unique images exist) */}
+            {hasGallery && (
+              <div className="flex sm:flex-col gap-3 order-2 sm:order-1 w-full sm:w-24 overflow-x-auto sm:overflow-y-auto max-h-[500px] shrink-0 pb-2 sm:pb-0">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 transition-all shrink-0 bg-[#fbf7f1] ${
+                      activeImageIndex === idx ? 'border-[#541d2b] shadow-md ring-2 ring-[#dfceae]/50' : 'border-[#eadaad]/60 opacity-80 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`${product.name} thumbnail ${idx + 1}`} className="w-full h-full object-contain p-2" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Large Main Image Display */}
             <div className="relative order-1 sm:order-2 flex-1 w-full rounded-2xl bg-[#fbf7f1] border border-[#eadaad]/60 overflow-hidden group shadow-inner min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center">
@@ -151,7 +153,7 @@ export default function ProductDetailClient({ product }: Props) {
                 title="Click to zoom image"
               >
                 <img
-                  src={images[activeImageIndex] || mainImg}
+                  src={currentImage}
                   alt={product.name}
                   className="max-h-[460px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 p-6"
                 />

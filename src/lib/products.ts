@@ -14,6 +14,7 @@ function mapProduct(p: any, statsMap: Record<string, { avg: number; count: numbe
     price: p.price,
     stock: p.stock,
     image: resolveProductImage(p),
+    images: Array.isArray(p.images) ? p.images : [],
     section: p.section || '',
     badge: p.badge || '',
     oldPrice: p.oldPrice || 0,
@@ -21,6 +22,10 @@ function mapProduct(p: any, statsMap: Record<string, { avg: number; count: numbe
     description: p.description || '',
     urduName: p.urduName || '',
     sortOrder: p.sortOrder || 0,
+    specifications: p.specifications || '',
+    benefits: p.benefits || '',
+    shippingInfo: p.shippingInfo || '',
+    returnPolicy: p.returnPolicy || '',
     reviewAvg: stat ? Math.round(stat.avg * 10) / 10 : null,
     reviewCount: stat ? stat.count : 0,
   };
