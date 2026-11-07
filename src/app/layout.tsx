@@ -105,7 +105,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${marcellus.variable} ${openSans.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="preload" as="image" href="/img/hero.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/img/hero.webp" type="image/webp" media="(min-width: 769px)" fetchPriority="high" />
+        <link rel="preload" as="image" href="/img/hero.jpg" type="image/jpeg" media="(min-width: 769px)" fetchPriority="high" />
+        <link rel="preload" as="image" href="/img/hero-mobile.jpg" type="image/jpeg" media="(max-width: 768px)" fetchPriority="high" />
       </head>
       <body suppressHydrationWarning>
         <JsonLd data={organizationJsonLd()} />
