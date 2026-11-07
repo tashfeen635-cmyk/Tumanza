@@ -52,17 +52,17 @@ async function optimizeImages() {
   }
 
   // Optimize logo
-  const logoPath = path.join(publicDir, 'img/logo.jpeg');
+  const logoPath = path.join(publicDir, 'img/tumanza-logo.png');
   if (fs.existsSync(logoPath)) {
     try {
       const statsBefore = fs.statSync(logoPath);
       const buffer = await sharp(logoPath)
         .resize(420, 140, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: 85 })
+        .png({ quality: 90, compressionLevel: 8 })
         .toBuffer();
       fs.writeFileSync(logoPath, buffer);
       const statsAfter = fs.statSync(logoPath);
-      console.log(`Optimized logo.jpeg: ${(statsBefore.size / 1024).toFixed(1)} KB -> ${(statsAfter.size / 1024).toFixed(1)} KB`);
+      console.log(`Optimized tumanza-logo.png: ${(statsBefore.size / 1024).toFixed(1)} KB -> ${(statsAfter.size / 1024).toFixed(1)} KB`);
     } catch (e) {}
   }
 
