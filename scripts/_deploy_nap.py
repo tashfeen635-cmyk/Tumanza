@@ -6,12 +6,19 @@ import paramiko
 sys.stdout.reconfigure(encoding='utf-8')
 
 ROOT = Path(__file__).resolve().parents[1]
-HOST = os.environ.get('DEPLOY_HOST', '31.97.216.150')
-USER = os.environ.get('DEPLOY_USER', 'root')
-PASSWORD = os.environ.get('DEPLOY_PASS', '@CP@@Zp)bHzxHG6T')
+HOST = os.environ.get('VPS_HOST') or os.environ.get('DEPLOY_HOST')
+USER = os.environ.get('VPS_USER') or os.environ.get('DEPLOY_USER') or 'root'
+PASSWORD = os.environ.get('VPS_PASSWORD') or os.environ.get('DEPLOY_PASS')
 REMOTE_APP = '/var/www/Tumanza'
 
 def main() -> int:
+    if not HOST:
+        print('ERROR: Set VPS_HOST or DEPLOY_HOST', file=sys.stderr)
+        return 1
+    if not PASSWORD:
+        print('ERROR: Set VPS_PASSWORD or DEPLOY_PASS', file=sys.stderr)
+        return 1
+
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     print(f'Connecting to {HOST} as {USER}...')

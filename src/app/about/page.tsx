@@ -50,26 +50,25 @@ export default function AboutPage() {
         <div className="container">
           <div className="about-story-grid">
             <div className="about-story-image relative h-[400px] rounded-2xl overflow-hidden">
-              <Image src="/images/showcase.png" alt="Our organic farm" fill sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" className="object-cover" />
+              <Image src="/images/himalayan-wellness-collection.png" alt="Tumanza Himalayan Wellness Collection" fill sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" className="object-cover" />
             </div>
             <div className="about-story-content">
               <h2 className="section-title">How It All Began</h2>
               <p>
-                Tumanza started in 2018 with a small family farm in the highlands of
-                Gilgit-Baltistan. What began as a passion for sharing the pure, untouched flavors of
-                mountain-grown nuts quickly grew into a mission to connect health-conscious families
-                with nature&apos;s finest organic produce.
+                TUMANZA was introduced in 2026 with a vision to bring nature-inspired wellness and
+                premium products to everyday life. Rooted in the natural richness of Pakistan, our
+                brand focuses on carefully selected products, with quality, authenticity, and trust
+                at its core.
               </p>
               <p>
-                Our founders spent years building relationships with local farmers who share our
-                commitment to organic, chemical-free farming. Every product we sell can be traced back
-                to the farm it came from &mdash; that&apos;s our promise of transparency and trust.
+                Our collection features three key categories: premium Shilajit sourced from
+                high-altitude mountain regions, Tumuru Tea made from wild thyme of Gilgit-Baltistan,
+                and carefully selected dry fruits.
               </p>
               <p>
-                Today, Tumanza serves thousands of families across Pakistan and beyond, delivering
-                handpicked, lab-tested organic nuts, seeds, herbs, and teas straight to their
-                doorsteps. We believe that good food should be accessible, honest, and kind to the
-                planet.
+                We prioritize Shilajit as our flagship product, followed by Tumuru Tea and dry fruits.
+                Every product reflects our commitment to quality, natural origins, and delivering a
+                premium experience to our customers.
               </p>
             </div>
           </div>

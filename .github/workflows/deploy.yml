@@ -19,9 +19,11 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/Tumanza
-            git reset --hard HEAD
             git pull origin main
             npm install
             npm run build
-            pm2 restart tumanza || pm2 start ecosystem.config.cjs
-            pm2 save
+            chown -R tumanza:tumanza /var/www/Tumanza/.next
+            # App must run under the tumanza user PM2 (systemd: pm2-tumanza.service).
+            # Never start a second copy under root's PM2 — that steals/conflicts on :3000.
+            su -s /bin/bash tumanza -c 'cd /var/www/Tumanza && pm2 restart tumanza || pm2 start ecosystem.config.cjs'
+            su -s /bin/bash tumanza -c 'pm2 save'
