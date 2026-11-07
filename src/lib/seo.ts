@@ -44,7 +44,7 @@ export function organizationJsonLd() {
     '@type': ['Organization', 'OnlineStore'],
     name: BRAND.name,
     url: getSiteUrl(),
-    logo: absoluteUrl('/img/logo.jpeg'),
+    logo: absoluteUrl('/img/tumanza-logo.png'),
     description: BRAND.tagline,
     email: CONTACT_INFO.email,
     telephone: CONTACT_INFO.phoneE164 || CONTACT_INFO.phone || undefined,

@@ -57,7 +57,7 @@ export default function Header() {
           {/* Center Logo */}
           <div className="header-center">
             <Link href="/" className="site-logo inline-block">
-              <Image src="/img/logo.png" alt="Tumanza" width={210} height={70} priority className="h-[50px] md:h-[70px] w-auto object-contain" />
+              <Image src="/img/tumanza-logo.png" alt="Tumanza" width={210} height={70} priority className="h-[50px] md:h-[70px] w-auto object-contain" />
             </Link>
           </div>
 
