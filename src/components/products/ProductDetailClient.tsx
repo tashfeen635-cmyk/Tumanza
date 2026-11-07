@@ -17,7 +17,6 @@ export default function ProductDetailClient({ product }: Props) {
 
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [zoomModalOpen, setZoomModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'shipping'>('overview');
 
   const [reviews, setReviews] = useState<ReviewRecord[]>([]);
@@ -141,37 +140,23 @@ export default function ProductDetailClient({ product }: Props) {
             )}
 
             {/* Large Main Image Display */}
-            <div className="relative order-1 sm:order-2 flex-1 w-full rounded-2xl bg-[#fbf7f1] border border-[#eadaad]/60 overflow-hidden group shadow-inner min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center">
+            <div className="relative order-1 sm:order-2 flex-1 w-full rounded-2xl bg-[#fbf7f1] border border-[#eadaad]/60 overflow-hidden group shadow-inner min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center p-6">
               {product.badge && (
                 <span className="absolute top-4 left-4 z-10 bg-[#541d2b] text-[#dfceae] text-xs font-semibold px-3 py-1.5 rounded-full shadow tracking-wider uppercase">
                   {product.badge}
                 </span>
               )}
               
-              <button
-                type="button"
-                onClick={() => setZoomModalOpen(true)}
-                className="absolute inset-0 w-full h-full flex items-center justify-center cursor-zoom-in focus:outline-none"
-                title="Click to zoom image"
-              >
-                <div className="relative w-full h-[460px] p-6">
-                  <Image
-                    src={currentImage}
-                    alt={product.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                    priority
-                    fetchPriority="high"
-                    className="object-contain transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-              </button>
-
-              <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 shadow border border-gray-200 pointer-events-none flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-[#541d2b]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                </svg>
-                Click to Zoom
+              <div className="relative w-full h-[460px]">
+                <Image
+                  src={currentImage}
+                  alt={product.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  fetchPriority="high"
+                  className="object-contain"
+                />
               </div>
             </div>
           </div>
@@ -194,36 +179,36 @@ export default function ProductDetailClient({ product }: Props) {
               {product.name}
             </h1>
             {product.urduName && (
-              <p className="text-base text-[#5d5b5b] font-medium mb-3 italic">
-                {product.urduName}
-              </p>
+              <p className="text-sm font-medium text-[#5d5b5b] mb-3">{product.urduName}</p>
             )}
 
-            {/* Rating & Reviews Count */}
-            <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
-              <div className="flex text-[#c4a35a] text-lg tracking-tight">{starsString}</div>
+            {/* Rating & Reviews Jump */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center text-amber-500 text-sm tracking-widest">
+                {starsString}
+              </div>
               <button
                 type="button"
                 onClick={() => setActiveTab('reviews')}
-                className="text-sm font-semibold text-[#541d2b] hover:underline"
+                className="text-xs font-semibold text-[#541d2b] hover:underline"
               >
-                {reviewsCount > 0 ? `${reviewsCount} Customer Reviews` : 'Be the first to review'}
+                ({reviewsCount} {reviewsCount === 1 ? 'Review' : 'Reviews'})
               </button>
             </div>
 
             {/* Pricing Section */}
-            <div className="flex items-baseline gap-4 mb-6 bg-[#fbf7f1] p-4 rounded-xl border border-[#eadaad]/50">
-              <div className="text-3xl sm:text-4xl font-serif font-bold text-[#541d2b]">
+            <div className="flex items-baseline gap-3 mb-6 p-4 rounded-xl bg-[#fbf7f1] border border-[#eadaad]/50">
+              <span className="text-2xl sm:text-3xl font-bold text-[#541d2b]">
                 Rs.{product.price.toFixed(2)}
-              </div>
-              {product.oldPrice > product.price && (
-                <div className="text-lg text-gray-400 line-through font-medium">
+              </span>
+              {product.oldPrice && product.oldPrice > 0 && (
+                <span className="text-base text-gray-400 line-through">
                   Rs.{product.oldPrice.toFixed(2)}
-                </div>
+                </span>
               )}
-              {product.oldPrice > product.price && (
-                <span className="ml-auto text-xs font-bold text-white bg-[#541d2b] px-2.5 py-1 rounded-full">
-                  Save Rs.{(product.oldPrice - product.price).toFixed(0)}
+              {product.oldPrice && product.oldPrice > product.price && (
+                <span className="ml-auto text-xs font-bold bg-[#b95871] text-white px-2.5 py-1 rounded-full">
+                  Save Rs.{(product.oldPrice - product.price).toFixed(2)}
                 </span>
               )}
             </div>
@@ -233,11 +218,11 @@ export default function ProductDetailClient({ product }: Props) {
               {descriptionText}
             </p>
 
-            {/* Quantity Selector & Action Buttons */}
-            <div className="space-y-4 pt-2 border-t border-gray-100">
+            {/* Quantity Selector & Order Now Action */}
+            <div className="space-y-4 mb-8">
               <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold text-gray-700">Quantity:</span>
-                <div className="inline-flex items-center border border-gray-300 rounded-lg bg-white overflow-hidden shadow-sm">
+                <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">Quantity:</span>
+                <div className="inline-flex items-center border border-gray-300 rounded-xl bg-white overflow-hidden shadow-xs">
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -245,9 +230,7 @@ export default function ProductDetailClient({ product }: Props) {
                   >
                     -
                   </button>
-                  <span className="px-4 py-2 text-sm font-bold text-[#1a1a1a] min-w-[40px] text-center">
-                    {quantity}
-                  </span>
+                  <span className="px-4 py-2 font-bold text-gray-800 text-sm">{quantity}</span>
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => q + 1)}
@@ -258,73 +241,75 @@ export default function ProductDetailClient({ product }: Props) {
                 </div>
               </div>
 
-              {/* Order Now / Add to Cart Button */}
-              <button
-                type="button"
-                onClick={() => openOrderPopup(product)}
-                className="w-full py-4 px-6 rounded-xl bg-[#541d2b] text-[#dfceae] hover:bg-[#3f1520] font-bold text-base tracking-wider uppercase shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3"
-              >
-                <svg className="w-5 h-5 text-[#dfceae]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                Order Now — Rs.{(product.price * quantity).toFixed(2)}
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => openOrderPopup(product)}
+                  className="flex-1 bg-[#541d2b] hover:bg-[#3f1520] text-[#dfceae] font-bold py-4 px-6 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 text-sm tracking-wider uppercase"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  ORDER NOW
+                </button>
 
-              {/* Wishlist Button directly underneath */}
-              <button
-                type="button"
-                onClick={() => toggleWishlist(product._id)}
-                className={`w-full py-3 px-6 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
-                  inWishlist
-                    ? 'border-[#541d2b] bg-[#541d2b]/5 text-[#541d2b]'
-                    : 'border-gray-300 hover:border-[#541d2b] text-gray-700 bg-white'
-                }`}
-              >
-                <span className={`text-lg ${inWishlist ? 'text-[#541d2b]' : 'text-gray-400'}`}>
-                  {inWishlist ? '♥' : '♡'}
-                </span>
-                {inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => toggleWishlist(product._id)}
+                  className={`p-4 rounded-xl border border-[#eadaad] flex items-center justify-center transition-all ${
+                    inWishlist ? 'bg-[#541d2b] text-[#dfceae]' : 'bg-white text-gray-700 hover:bg-[#fbf7f1]'
+                  }`}
+                  title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill={inWishlist ? 'currentColor' : 'none'}
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
-            {/* Guarantee / Perks bar */}
-            <div className="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-gray-100 text-xs text-gray-600 font-medium">
-              <div className="flex items-center gap-2 bg-[#fbf7f1] p-3 rounded-lg border border-[#eadaad]/40">
-                <span className="text-base">🚚</span>
-                <span>{product.shippingInfo || 'Fast Nationwide Delivery'}</span>
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-3 pt-6 border-t border-gray-100 text-center">
+              <div className="p-3 bg-[#fbf7f1] rounded-xl border border-[#eadaad]/40">
+                <span className="block font-bold text-xs text-[#541d2b]">100% Organic</span>
+                <span className="text-[11px] text-gray-500">Pure Harvest</span>
               </div>
-              <div className="flex items-center gap-2 bg-[#fbf7f1] p-3 rounded-lg border border-[#eadaad]/40">
-                <span className="text-base">🛡️</span>
-                <span>100% Pure &amp; Organic</span>
+              <div className="p-3 bg-[#fbf7f1] rounded-xl border border-[#eadaad]/40">
+                <span className="block font-bold text-xs text-[#541d2b]">Fast Shipping</span>
+                <span className="text-[11px] text-gray-500">Nationwide</span>
+              </div>
+              <div className="p-3 bg-[#fbf7f1] rounded-xl border border-[#eadaad]/40">
+                <span className="block font-bold text-xs text-[#541d2b]">Lab Tested</span>
+                <span className="text-[11px] text-gray-500">Highest Quality</span>
               </div>
             </div>
 
           </div>
         </div>
 
-        {/* Additional Sections: Tabs for Details, Reviews, Shipping & Returns */}
-        <div className="mt-12 bg-white rounded-2xl shadow-sm border border-[#eadaad]/40 overflow-hidden">
-          
-          {/* Tab Headers */}
-          <div className="flex border-b border-gray-200 bg-[#fbf7f1]/50 overflow-x-auto">
+        {/* Tabs Section: Overview / Reviews / Shipping */}
+        <div className="mt-14 border-t border-gray-200 pt-10">
+          <div className="flex border-b border-gray-200 gap-8">
             <button
               type="button"
               onClick={() => setActiveTab('overview')}
-              className={`px-6 py-4 font-serif text-sm sm:text-base font-semibold border-b-2 transition-all whitespace-nowrap ${
-                activeTab === 'overview'
-                  ? 'border-[#541d2b] text-[#541d2b] bg-white'
-                  : 'border-transparent text-gray-600 hover:text-[#541d2b]'
+              className={`pb-4 text-sm sm:text-base font-bold transition-all relative ${
+                activeTab === 'overview' ? 'text-[#541d2b] border-b-2 border-[#541d2b]' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              Product Specifications &amp; Details
+              Product Overview
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('reviews')}
-              className={`px-6 py-4 font-serif text-sm sm:text-base font-semibold border-b-2 transition-all whitespace-nowrap ${
-                activeTab === 'reviews'
-                  ? 'border-[#541d2b] text-[#541d2b] bg-white'
-                  : 'border-transparent text-gray-600 hover:text-[#541d2b]'
+              className={`pb-4 text-sm sm:text-base font-bold transition-all relative ${
+                activeTab === 'reviews' ? 'text-[#541d2b] border-b-2 border-[#541d2b]' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
               Customer Reviews ({reviewsCount})
@@ -332,163 +317,103 @@ export default function ProductDetailClient({ product }: Props) {
             <button
               type="button"
               onClick={() => setActiveTab('shipping')}
-              className={`px-6 py-4 font-serif text-sm sm:text-base font-semibold border-b-2 transition-all whitespace-nowrap ${
-                activeTab === 'shipping'
-                  ? 'border-[#541d2b] text-[#541d2b] bg-white'
-                  : 'border-transparent text-gray-600 hover:text-[#541d2b]'
+              className={`pb-4 text-sm sm:text-base font-bold transition-all relative ${
+                activeTab === 'shipping' ? 'text-[#541d2b] border-b-2 border-[#541d2b]' : 'text-gray-400 hover:text-gray-600'
               }`}
             >
-              Shipping &amp; Return Policy
+              Shipping &amp; Returns
             </button>
           </div>
 
-          {/* Tab Contents */}
-          <div className="p-6 sm:p-10">
-            
-            {/* Tab 1: Overview */}
+          <div className="py-8">
             {activeTab === 'overview' && (
-              <div className="space-y-6">
-                <h3 className="text-xl font-serif font-bold text-[#1a1a1a]">About {product.name}</h3>
-                <p className="text-gray-700 text-base leading-relaxed">
-                  {descriptionText}
+              <div className="prose max-w-none text-gray-600 text-sm sm:text-base leading-relaxed space-y-4">
+                <p>{descriptionText}</p>
+                <p>
+                  Handpicked and sustainably packed to retain maximum natural freshness and nutritional benefits. Enjoy the authentic, rich taste of premium organic produce directly from nature.
                 </p>
-
-                {product.benefits && (
-                  <div className="bg-[#fbf7f1] p-4 rounded-xl border border-[#eadaad]/50">
-                    <h4 className="font-serif font-bold text-sm text-[#541d2b] mb-1">Key Benefits &amp; Features</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed">{product.benefits}</p>
-                  </div>
-                )}
-
-                {product.specifications && (
-                  <div className="bg-[#fbf7f1] p-4 rounded-xl border border-[#eadaad]/50">
-                    <h4 className="font-serif font-bold text-sm text-[#541d2b] mb-1">Detailed Specifications</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed">{product.specifications}</p>
-                  </div>
-                )}
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-                  <div className="flex justify-between py-2.5 border-b border-gray-100 text-sm">
-                    <span className="font-semibold text-gray-600">Category</span>
-                    <span className="text-gray-900">{product.category}</span>
-                  </div>
-                  <div className="flex justify-between py-2.5 border-b border-gray-100 text-sm">
-                    <span className="font-semibold text-gray-600">Availability</span>
-                    <span className="text-[#8B9A46] font-semibold">{product.stock || 'In Stock'}</span>
-                  </div>
-                  <div className="flex justify-between py-2.5 border-b border-gray-100 text-sm">
-                    <span className="font-semibold text-gray-600">Brand</span>
-                    <span className="text-gray-900">Tumanza (Gilgit-Baltistan)</span>
-                  </div>
-                  <div className="flex justify-between py-2.5 border-b border-gray-100 text-sm">
-                    <span className="font-semibold text-gray-600">Quality</span>
-                    <span className="text-gray-900">100% Natural &amp; Handpicked</span>
-                  </div>
-                </div>
               </div>
             )}
 
-            {/* Tab 2: Reviews */}
             {activeTab === 'reviews' && (
               <div className="space-y-8">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-200">
-                  <div>
-                    <h3 className="text-xl font-serif font-bold text-[#1a1a1a]">Customer Feedback &amp; Ratings</h3>
-                    <p className="text-sm text-gray-500 mt-1">Real experiences from verified Tumanza shoppers.</p>
-                  </div>
-                  {avgRating != null && (
-                    <div className="flex items-center gap-3 bg-[#fbf7f1] px-4 py-2.5 rounded-xl border border-[#eadaad]/60">
-                      <span className="text-2xl font-serif font-bold text-[#541d2b]">{avgRating.toFixed(1)}</span>
-                      <div>
-                        <div className="text-[#c4a35a] text-sm">{'★'.repeat(Math.round(avgRating))}</div>
-                        <div className="text-xs text-gray-500">{reviewsCount} total ratings</div>
+                {token ? (
+                  <form onSubmit={handleReviewSubmit} className="bg-[#fbf7f1] p-6 rounded-2xl border border-[#eadaad]/60">
+                    <h3 className="text-lg font-serif font-bold text-[#1a1a1a] mb-2">Leave Your Review</h3>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-sm font-semibold text-gray-700">Rating:</span>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <button
+                            type="button"
+                            key={s}
+                            onClick={() => setUserRating(s)}
+                            className={`text-2xl ${s <= userRating ? 'text-amber-500' : 'text-gray-300'}`}
+                          >
+                            ★
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  )}
-                </div>
-
-                {/* Submit Review Form */}
-                <div className="bg-[#fbf7f1] p-6 rounded-2xl border border-[#eadaad]/50">
-                  <h4 className="font-serif font-bold text-base text-[#1a1a1a] mb-3">Leave a Review</h4>
-                  {token ? (
-                    <form onSubmit={handleReviewSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Your Rating</label>
-                        <div className="flex gap-2">
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <button
-                              key={n}
-                              type="button"
-                              onClick={() => setUserRating(n)}
-                              className={`text-2xl transition-colors ${n <= userRating ? 'text-[#c4a35a]' : 'text-gray-300'}`}
-                            >
-                              ★
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Your Review</label>
-                        <textarea
-                          value={userComment}
-                          onChange={(e) => setUserComment(e.target.value)}
-                          rows={3}
-                          placeholder="Share your thoughts about taste, packaging, and freshness..."
-                          className="w-full p-3.5 rounded-xl border border-gray-300 focus:outline-none focus:border-[#541d2b] text-sm bg-white"
-                          required
-                        />
-                      </div>
-
-                      <button
-                        type="submit"
-                        disabled={submittingReview}
-                        className="py-3 px-6 rounded-xl bg-[#541d2b] text-[#dfceae] hover:bg-[#3f1520] font-bold text-sm uppercase tracking-wider transition-all shadow"
-                      >
-                        {submittingReview ? 'Submitting...' : 'Post Review'}
-                      </button>
-
-                      {reviewMessage && (
-                        <p className={`text-sm font-semibold mt-2 ${reviewMessage.error ? 'text-red-600' : 'text-green-700'}`}>
-                          {reviewMessage.text}
-                        </p>
-                      )}
-                    </form>
-                  ) : (
-                    <p className="text-sm text-gray-600">
-                      Please <Link href="/account" className="text-[#541d2b] font-bold underline">sign in to your account</Link> to submit a review.
-                    </p>
-                  )}
-                </div>
-
-                {/* Reviews List */}
-                {reviews.length === 0 ? (
-                  <p className="text-sm text-gray-500 py-4 text-center">No reviews yet for this product. Be the first to share your review!</p>
+                    <textarea
+                      rows={4}
+                      value={userComment}
+                      onChange={(e) => setUserComment(e.target.value)}
+                      placeholder="Write your experience with this product..."
+                      className="w-full p-4 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#541d2b]/20 mb-4"
+                    />
+                    {reviewMessage && (
+                      <p className={`text-xs mb-3 font-semibold ${reviewMessage.error ? 'text-red-600' : 'text-[#541d2b]'}`}>
+                        {reviewMessage.text}
+                      </p>
+                    )}
+                    <button
+                      type="submit"
+                      disabled={submittingReview}
+                      className="bg-[#541d2b] hover:bg-[#3f1520] text-[#dfceae] font-bold px-6 py-2.5 rounded-xl text-xs tracking-wider uppercase transition-all shadow"
+                    >
+                      {submittingReview ? 'Submitting...' : 'Submit Review'}
+                    </button>
+                  </form>
                 ) : (
-                  <div className="space-y-4">
-                    {reviews.map((r) => (
-                      <div key={r._id} className="p-5 rounded-xl border border-gray-100 bg-white shadow-xs">
-                        <div className="flex items-center justify-between mb-2">
-                          <strong className="text-sm font-semibold text-gray-900">{r.userName}</strong>
-                          <span className="text-[#c4a35a] text-sm tracking-tighter">{'★'.repeat(r.rating)}</span>
-                        </div>
-                        <p className="text-sm text-gray-700 leading-relaxed">{r.comment}</p>
-                      </div>
-                    ))}
+                  <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-600 flex items-center justify-between">
+                    <span>Want to share your review? Sign in to your account.</span>
+                    <Link href="/account" className="font-bold text-[#541d2b] hover:underline">
+                      Sign In &rarr;
+                    </Link>
                   </div>
                 )}
+
+                <div className="space-y-4">
+                  {reviews.length === 0 ? (
+                    <p className="text-gray-500 text-sm">No reviews yet for this product. Be the first to review!</p>
+                  ) : (
+                    reviews.map((r) => {
+                      const rStars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
+                      return (
+                        <div key={r._id} className="p-4 rounded-xl border border-gray-100 bg-white shadow-xs">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-bold text-gray-800 text-sm">{r.userName}</span>
+                            <span className="text-xs text-gray-400">{r.createdAt?.slice(0, 10)}</span>
+                          </div>
+                          <div className="text-amber-500 text-xs mb-2">
+                            {rStars}
+                          </div>
+                          <p className="text-gray-600 text-sm">{r.comment}</p>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             )}
 
-            {/* Tab 3: Shipping & Returns */}
             {activeTab === 'shipping' && (
-              <div className="space-y-6 text-gray-700 text-sm sm:text-base leading-relaxed">
-                <div>
-                  <h3 className="text-xl font-serif font-bold text-[#1a1a1a] mb-2">Shipping &amp; Delivery</h3>
-                  <p>
-                    {product.shippingInfo || 'We deliver across all major cities and towns in Pakistan. Orders are typically processed within 24 hours and shipped via reliable courier services. Delivery time usually takes 2 to 4 business days.'}
-                  </p>
-                </div>
+              <div className="prose max-w-none text-gray-600 text-sm sm:text-base leading-relaxed space-y-4">
+                <h3 className="text-xl font-serif font-bold text-[#1a1a1a] mb-2">Shipping Information</h3>
+                <p>
+                  We ship nationwide across Pakistan with reliable courier partners. Standard delivery takes 2 to 4 business days. Free shipping on qualifying orders.
+                </p>
                 <div className="pt-4 border-t border-gray-100">
                   <h3 className="text-xl font-serif font-bold text-[#1a1a1a] mb-2">Return &amp; Exchange Policy</h3>
                   <p>
@@ -497,37 +422,11 @@ export default function ProductDetailClient({ product }: Props) {
                 </div>
               </div>
             )}
-
           </div>
         </div>
-      </div>
 
       </div>
-
-      {/* Zoom / Lightbox Modal */}
-      {zoomModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="relative max-w-4xl max-h-[90vh] w-full bg-white rounded-2xl overflow-hidden p-6 flex flex-col items-center shadow-2xl">
-            <button
-              type="button"
-              onClick={() => setZoomModalOpen(false)}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 flex items-center justify-center font-bold text-xl transition-colors"
-            >
-              &times;
-            </button>
-            <h3 className="text-lg font-serif font-bold text-[#1a1a1a] mb-4">{product.name} — High Resolution View</h3>
-            <div className="relative overflow-hidden flex items-center justify-center p-4 bg-[#fbf7f1] rounded-xl w-full h-[70vh]">
-              <Image
-                src={images[activeImageIndex] || mainImg}
-                alt={`${product.name} zoomed`}
-                fill
-                sizes="90vw"
-                className="object-contain"
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
+  </div>
   );
 }
