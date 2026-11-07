@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 
@@ -55,8 +56,8 @@ export default function Header() {
 
           {/* Center Logo */}
           <div className="header-center">
-            <Link href="/" className="site-logo">
-              <img src="/img/logo.jpeg" alt="Tumanza" />
+            <Link href="/" className="site-logo inline-block">
+              <Image src="/img/logo.jpeg" alt="Tumanza" width={210} height={70} priority className="h-[50px] md:h-[70px] w-auto object-contain" />
             </Link>
           </div>
 

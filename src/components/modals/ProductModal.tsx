@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import { ReviewRecord } from '@/lib/types';
 
@@ -136,9 +137,7 @@ export default function ProductModal() {
 
   const displayImage =
     !selectedProduct.image || selectedProduct.image.includes('unsplash')
-      ? selectedProduct.name?.toLowerCase().includes('shilajit')
-        ? '/images/shilajit.png'
-        : '/images/product-pack.jpg'
+      ? '/images/product-pack.jpg'
       : selectedProduct.image;
 
   return (
@@ -160,7 +159,9 @@ export default function ProductModal() {
         <div className="product-modal-inner">
           <div className="product-modal-image">
             <div className="special-img-wrapper">
-              <img id="modalProductImg" src={displayImage} alt={selectedProduct.name} loading="lazy" />
+              <div className="relative w-full h-[350px]">
+                <Image id="modalProductImg" src={displayImage} alt={selectedProduct.name} fill sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" className="object-contain" />
+              </div>
               {selectedProduct.badge && (
                 <div className="special-badge" id="modalProductBadge">
                   {selectedProduct.badge}

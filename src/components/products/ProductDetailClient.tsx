@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem, ReviewRecord } from '@/lib/types';
 import { resolveProductImage } from '@/lib/seo';
@@ -133,7 +134,7 @@ export default function ProductDetailClient({ product }: Props) {
                       activeImageIndex === idx ? 'border-[#541d2b] shadow-md ring-2 ring-[#dfceae]/50' : 'border-[#eadaad]/60 opacity-80 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt={`${product.name} thumbnail ${idx + 1}`} className="w-full h-full object-contain p-2" />
+                    <Image src={img} alt={`${product.name} thumbnail ${idx + 1}`} fill sizes="96px" className="object-contain p-2" />
                   </button>
                 ))}
               </div>
@@ -153,12 +154,17 @@ export default function ProductDetailClient({ product }: Props) {
                 className="absolute inset-0 w-full h-full flex items-center justify-center cursor-zoom-in focus:outline-none"
                 title="Click to zoom image"
               >
-                <img
-                  src={currentImage}
-                  alt={product.name}
-                  fetchPriority="high"
-                  className="max-h-[460px] w-auto object-contain transition-transform duration-500 group-hover:scale-105 p-6"
-                />
+                <div className="relative w-full h-[460px] p-6">
+                  <Image
+                    src={currentImage}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                    fetchPriority="high"
+                    className="object-contain transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
               </button>
 
               <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 shadow border border-gray-200 pointer-events-none flex items-center gap-1.5">
@@ -510,11 +516,13 @@ export default function ProductDetailClient({ product }: Props) {
               &times;
             </button>
             <h3 className="text-lg font-serif font-bold text-[#1a1a1a] mb-4">{product.name} — High Resolution View</h3>
-            <div className="flex-1 overflow-auto flex items-center justify-center p-4 bg-[#fbf7f1] rounded-xl w-full">
-              <img
+            <div className="relative overflow-hidden flex items-center justify-center p-4 bg-[#fbf7f1] rounded-xl w-full h-[70vh]">
+              <Image
                 src={images[activeImageIndex] || mainImg}
                 alt={`${product.name} zoomed`}
-                className="max-h-[70vh] w-auto object-contain"
+                fill
+                sizes="90vw"
+                className="object-contain"
               />
             </div>
           </div>

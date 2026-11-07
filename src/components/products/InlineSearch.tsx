@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem } from '@/lib/types';
 import { productSlug } from '@/lib/seo';
@@ -98,9 +99,7 @@ export default function InlineSearch() {
               results.map((p) => {
                 const searchImg =
                   !p.image || p.image.includes('unsplash')
-                    ? p.name?.toLowerCase().includes('shilajit')
-                      ? '/images/shilajit.png'
-                      : '/images/product-pack.jpg'
+                    ? '/images/product-pack.jpg'
                     : p.image;
 
                 return (
@@ -112,7 +111,9 @@ export default function InlineSearch() {
                       router.push(`/product/${productSlug(p)}`);
                     }}
                   >
-                    <img className="search-result-img" src={searchImg} alt={p.name} loading="lazy" />
+                    <div className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded">
+                      <Image src={searchImg} alt={p.name} fill sizes="48px" loading="lazy" className="object-cover" />
+                    </div>
                     <div className="search-result-info">
                       <div className="search-result-name">{p.name}</div>
                       <div className="search-result-meta">

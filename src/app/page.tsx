@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import {
   InlineSearch,
@@ -38,18 +39,44 @@ export default function HomePage() {
   ];
 
   const instagramImages = [
-    '/images/shilajit.png',
     '/images/product-pack.jpg',
     '/images/showcase.png',
     '/img/hero.jpg',
-    '/img/hero-mobile.png',
+    '/img/hero-mobile.jpg',
     '/images/product-pack.jpg',
+    '/images/showcase.png',
   ];
 
   return (
     <div>
       {/* ========== HERO SECTION ========== */}
       <section className="hero">
+        {/* Desktop Hero Image */}
+        <div className="absolute inset-0 z-0 hidden md:block">
+          <Image
+            src="/img/hero.jpg"
+            alt="Tumanza Hero Background"
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            quality={75}
+            className="object-cover object-right"
+          />
+        </div>
+        {/* Mobile Hero Image */}
+        <div className="absolute inset-0 z-0 block md:hidden">
+          <Image
+            src="/img/hero-mobile.jpg"
+            alt="Tumanza Hero Background"
+            fill
+            priority
+            fetchPriority="high"
+            sizes="100vw"
+            quality={75}
+            className="object-cover object-bottom"
+          />
+        </div>
         <div className="hero-overlay"></div>
         <div className="hero-inner">
           <div className="hero-content">
@@ -131,9 +158,16 @@ export default function HomePage() {
               href="https://www.instagram.com/tumanza.official/"
               target="_blank"
               rel="noopener noreferrer"
-              className="instagram-item"
+              className="instagram-item relative block h-64 overflow-hidden"
             >
-              <img src={src} alt={`Instagram ${i + 1}`} loading="lazy" />
+              <Image
+                src={src}
+                alt={`Instagram ${i + 1}`}
+                fill
+                sizes="(max-width: 768px) 50vw, 33vw"
+                loading="lazy"
+                className="object-cover"
+              />
               <div className="instagram-overlay">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
                   <rect

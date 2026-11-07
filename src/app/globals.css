@@ -57,12 +57,16 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 /* Instant Image Loading & Warm Organic Placeholders */
-img {
+.product-img img,
+.search-result-img {
   background-color: #fbf7f1;
   content-visibility: auto;
 }
 .product-img {
   background-color: #fbf7f1;
+}
+.site-logo img {
+  background-color: transparent !important;
 }
 
 /* Wishlist Heart Product Card Button */

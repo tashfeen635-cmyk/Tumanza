@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 import { requireAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -26,17 +27,15 @@ export async function POST(request: Request) {
       'image/webp',
       'image/gif',
       'image/avif',
-      'image/svg+xml',
     ];
 
     if (!validMimes.includes(file.type.toLowerCase())) {
       return NextResponse.json(
-        { error: 'Invalid file type. Supported formats: JPG, PNG, WebP, GIF, AVIF, SVG.' },
+        { error: 'Invalid file type. Supported formats: JPG, PNG, WebP, GIF, AVIF.' },
         { status: 400 }
       );
     }
 
-    // Limit to 4MB
     const MAX_SIZE = 4 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       return NextResponse.json({ error: 'File size exceeds 4MB limit' }, { status: 400 });
@@ -47,19 +46,18 @@ export async function POST(request: Request) {
       fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    const originalExt = path.extname(file.name).toLowerCase() || '.jpg';
-    const safeExt = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg'].includes(originalExt)
-      ? originalExt
-      : '.jpg';
-
-    const cleanBase = path.basename(file.name, originalExt).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 30);
-    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    const filename = `product-${uniqueSuffix}-${cleanBase || 'img'}${safeExt}`;
-    const destinationPath = path.join(uploadsDir, filename);
-
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    await fs.promises.writeFile(destinationPath, buffer);
+
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const filename = `product-${uniqueSuffix}.jpg`;
+    const destinationPath = path.join(uploadsDir, filename);
+
+    // Optimize and resize with sharp
+    await sharp(buffer)
+      .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 80, progressive: true })
+      .toFile(destinationPath);
 
     const publicUrl = `/uploads/${filename}`;
     return NextResponse.json({ url: publicUrl, filename });

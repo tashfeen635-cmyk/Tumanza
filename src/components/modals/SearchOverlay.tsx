@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem } from '@/lib/types';
 import { productSlug } from '@/lib/seo';
@@ -135,9 +136,7 @@ export default function SearchOverlay() {
             {results.map((product) => {
               const resultImg =
                 !product.image || product.image.includes('unsplash')
-                  ? product.name?.toLowerCase().includes('shilajit')
-                    ? '/images/shilajit.png'
-                    : '/images/product-pack.jpg'
+                  ? '/images/product-pack.jpg'
                   : product.image;
 
               return (
@@ -149,7 +148,9 @@ export default function SearchOverlay() {
                     router.push(`/product/${productSlug(product)}`);
                   }}
                 >
-                  <img className="search-result-img" src={resultImg} alt={product.name} loading="lazy" />
+                  <div className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded">
+                    <Image src={resultImg} alt={product.name} fill sizes="48px" loading="lazy" className="object-cover" />
+                  </div>
                   <div className="search-result-info">
                     <div className="search-result-name">{product.name}</div>
                     <div className="search-result-meta">

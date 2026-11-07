@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Features, Newsletter } from '@/components';
 
 export default function AboutPage() {
@@ -48,8 +49,8 @@ export default function AboutPage() {
       <section className="about-story">
         <div className="container">
           <div className="about-story-grid">
-            <div className="about-story-image">
-              <img src="/images/showcase.png" alt="Our organic farm" loading="lazy" />
+            <div className="about-story-image relative h-[400px] rounded-2xl overflow-hidden">
+              <Image src="/images/showcase.png" alt="Our organic farm" fill sizes="(max-width: 768px) 100vw, 50vw" loading="lazy" className="object-cover" />
             </div>
             <div className="about-story-content">
               <h2 className="section-title">How It All Began</h2>

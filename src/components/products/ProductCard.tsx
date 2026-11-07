@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem } from '@/lib/types';
@@ -21,9 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const displayImage =
     !product.image || product.image.includes('unsplash')
-      ? product.name?.toLowerCase().includes('shilajit')
-        ? '/images/shilajit.png'
-        : '/images/product-pack.jpg'
+      ? '/images/product-pack.jpg'
       : product.image;
 
   const starsHtml = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
@@ -34,8 +33,15 @@ export default function ProductCard({ product }: ProductCardProps) {
       onClick={() => router.push(href)}
       style={{ cursor: 'pointer' }}
     >
-      <div className="product-img">
-        <img src={displayImage} alt={`${product.name} — buy online at Tumanza`} fetchPriority="high" />
+      <div className="product-img relative block h-64 overflow-hidden">
+        <Image
+          src={displayImage}
+          alt={`${product.name} — buy online at Tumanza`}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          loading="lazy"
+          className="object-cover"
+        />
         {product.badge && (
           <span className={`product-badge ${product.badge.toLowerCase()}`}>
             {product.badge}

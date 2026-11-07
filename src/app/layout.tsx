@@ -1,25 +1,25 @@
 import type { Metadata, Viewport } from 'next';
 import { Marcellus, Open_Sans } from 'next/font/google';
+import dynamic from 'next/dynamic';
 import './globals.css';
 import { StoreProvider } from '@/context/StoreContext';
-import {
-  Header,
-  Footer,
-  SearchOverlay,
-  ProductModal,
-  OrderPopup,
-  PolicyModal,
-  BackToTop,
-} from '@/components';
+import { Header, Footer } from '@/components';
 import JsonLd from '@/components/seo/JsonLd';
 import { organizationJsonLd } from '@/lib/seo';
 import { absoluteUrl, getSiteUrl } from '@/lib/site';
+
+const SearchOverlay = dynamic(() => import('@/components/modals/SearchOverlay'));
+const ProductModal = dynamic(() => import('@/components/modals/ProductModal'));
+const OrderPopup = dynamic(() => import('@/components/modals/OrderPopup'));
+const PolicyModal = dynamic(() => import('@/components/modals/PolicyModal'));
+const BackToTop = dynamic(() => import('@/components/layout/BackToTop'));
 
 const marcellus = Marcellus({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-marcellus',
   display: 'swap',
+  adjustFontFallback: true,
 });
 
 const openSans = Open_Sans({
@@ -27,6 +27,7 @@ const openSans = Open_Sans({
   weight: ['300', '400', '500', '600', '700'],
   variable: '--font-opensans',
   display: 'swap',
+  adjustFontFallback: true,
 });
 
 export const viewport: Viewport = {
