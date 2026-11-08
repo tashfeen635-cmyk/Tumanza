@@ -100,7 +100,7 @@ export default function HomePage() {
       <section className="products-section" id="shop" data-section-name="popular">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Popular Products</h2>
+            <h2 className="section-title">Tumanza&apos;s Collection</h2>
             <p className="section-subtitle">
               Our most loved organic nuts that customers keep coming back for
             </p>

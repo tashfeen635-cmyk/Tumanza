@@ -119,7 +119,7 @@ export default function ProductDetailClient({ product }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
            {/* Left Column: Product Gallery (55% -> col-span-7) */}
-          <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4 items-start sticky top-28">
+          <div className="lg:col-span-7 flex flex-col sm:flex-row gap-4 items-start lg:sticky lg:top-28">
             
             {/* Thumbnails (rendered only if multiple unique images exist) */}
             {hasGallery && (
@@ -140,14 +140,14 @@ export default function ProductDetailClient({ product }: Props) {
             )}
 
             {/* Large Main Image Display */}
-            <div className="relative order-1 sm:order-2 flex-1 w-full rounded-2xl bg-[#fbf7f1] border border-[#eadaad]/60 overflow-hidden group shadow-inner min-h-[380px] sm:min-h-[480px] lg:min-h-[540px] flex items-center justify-center p-6">
+            <div className="relative order-1 sm:order-2 flex-1 w-full rounded-2xl bg-[#fbf7f1] border border-[#eadaad]/60 overflow-hidden group shadow-inner aspect-square flex items-center justify-center p-4 sm:p-6">
               {product.badge && (
                 <span className="absolute top-4 left-4 z-10 bg-[#541d2b] text-[#dfceae] text-xs font-semibold px-3 py-1.5 rounded-full shadow tracking-wider uppercase">
                   {product.badge}
                 </span>
               )}
               
-              <div className="relative w-full h-[460px]">
+              <div className="relative w-full h-full">
                 <Image
                   src={currentImage}
                   alt={product.name}
@@ -175,7 +175,7 @@ export default function ProductDetailClient({ product }: Props) {
             </div>
 
             {/* Title & Urdu Name */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif text-[#1a1a1a] font-bold leading-tight mb-1">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-heading text-[#1a1a1a] font-bold leading-tight mb-1">
               {product.name}
             </h1>
             {product.urduName && (
@@ -339,7 +339,7 @@ export default function ProductDetailClient({ product }: Props) {
               <div className="space-y-8">
                 {token ? (
                   <form onSubmit={handleReviewSubmit} className="bg-[#fbf7f1] p-6 rounded-2xl border border-[#eadaad]/60">
-                    <h3 className="text-lg font-serif font-bold text-[#1a1a1a] mb-2">Leave Your Review</h3>
+                    <h3 className="text-lg font-heading font-bold text-[#1a1a1a] mb-2">Leave Your Review</h3>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-sm font-semibold text-gray-700">Rating:</span>
                       <div className="flex gap-1">
@@ -410,12 +410,12 @@ export default function ProductDetailClient({ product }: Props) {
 
             {activeTab === 'shipping' && (
               <div className="prose max-w-none text-gray-600 text-sm sm:text-base leading-relaxed space-y-4">
-                <h3 className="text-xl font-serif font-bold text-[#1a1a1a] mb-2">Shipping Information</h3>
+                <h3 className="text-xl font-heading font-bold text-[#1a1a1a] mb-2">Shipping Information</h3>
                 <p>
                   We ship nationwide across Pakistan with reliable courier partners. Standard delivery takes 2 to 4 business days. Free shipping on qualifying orders.
                 </p>
                 <div className="pt-4 border-t border-gray-100">
-                  <h3 className="text-xl font-serif font-bold text-[#1a1a1a] mb-2">Return &amp; Exchange Policy</h3>
+                  <h3 className="text-xl font-heading font-bold text-[#1a1a1a] mb-2">Return &amp; Exchange Policy</h3>
                   <p>
                     {product.returnPolicy || 'Your satisfaction is our utmost priority. If you receive a damaged or incorrect package, please contact our support team within 48 hours of delivery for a prompt replacement or refund.'}
                   </p>
