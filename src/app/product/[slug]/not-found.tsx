@@ -7,8 +7,8 @@ export default function ProductNotFound() {
       <p style={{ margin: '12px 0 24px', color: '#666' }}>
         This product may have been removed or the link is outdated.
       </p>
-      <Link href="/shop" className="btn btn-primary">
-        Browse Shop
+      <Link href="/products" className="btn btn-primary">
+        Browse Products
       </Link>
     </div>
   );

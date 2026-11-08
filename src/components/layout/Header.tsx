@@ -37,8 +37,8 @@ export default function Header() {
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className={pathname === '/shop' ? 'active' : ''}>
-                  SHOP
+                <Link href="/products" className={pathname === '/products' ? 'active' : ''}>
+                  PRODUCT
                 </Link>
               </li>
               <li>
@@ -76,7 +76,7 @@ export default function Header() {
                 </svg>
               </button>
 
-              <Link href="/shop" className="header-icon" aria-label="Shop">
+              <Link href="/products" className="header-icon" aria-label="Products">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="9" cy="21" r="1"></circle>
                   <circle cx="20" cy="21" r="1"></circle>
@@ -114,8 +114,8 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/shop" onClick={() => setMobileMenuOpen(false)}>
-                SHOP
+              <Link href="/products" onClick={() => setMobileMenuOpen(false)}>
+                PRODUCT
               </Link>
             </li>
             <li>

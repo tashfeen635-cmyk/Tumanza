@@ -79,7 +79,7 @@ export default async function ProductPage({ params }: Props) {
           productJsonLd(product),
           breadcrumbJsonLd([
             { name: 'Home', path: '/' },
-            { name: 'Shop', path: '/shop' },
+            { name: 'Products', path: '/products' },
             { name: product.name, path: `/product/${productSlug(product)}` },
           ]),
           faqJsonLd(faqs),

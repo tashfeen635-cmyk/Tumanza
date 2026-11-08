@@ -331,7 +331,7 @@ function AccountContent() {
                 ) : orders.length === 0 ? (
                   <div className="orders-empty">
                     <p>You have not placed any orders yet.</p>
-                    <Link href="/shop" className="btn btn-primary">
+                    <Link href="/products" className="btn btn-primary">
                       START SHOPPING
                     </Link>
                   </div>

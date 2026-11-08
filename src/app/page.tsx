@@ -86,7 +86,7 @@ export default function HomePage() {
               Handpicked from the best farms around the world. Pure, raw, and packed with natural
               goodness for a healthier you.
             </p>
-            <Link href="/shop" className="btn btn-white">
+            <Link href="/products" className="btn btn-white">
               SHOP NOW
             </Link>
           </div>
@@ -112,7 +112,7 @@ export default function HomePage() {
           </div>
           {displayProducts.length > 0 && (
             <div style={{ textAlign: 'center', marginTop: '45px' }}>
-              <Link href="/shop" className="btn btn-primary">
+              <Link href="/products" className="btn btn-primary">
                 MORE PRODUCTS
               </Link>
             </div>
