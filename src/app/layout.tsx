@@ -37,15 +37,16 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "Tumanza — Nature's Finest Organic Nuts, Herbs & Superfoods",
+    default: "Tumanza — Natural Wellness & Organic Products",
     template: '%s | Tumanza',
   },
   description:
-    'Buy premium organic nuts, seeds, herbs & teas from Gilgit-Baltistan. Handpicked, pure, and delivered across Pakistan by Tumanza.',
+    'Discover premium Shilajit, wild herbal tea, dry fruits and Nuts. Natural goodness, carefully sourced for better living.',
   keywords: [
     'Tumanza',
     'organic nuts Pakistan',
-    'Hunza walnuts',
+    'Shilajit Pakistan',
+    'wild herbal tea',
     'Gilgit-Baltistan dry fruits',
     'organic almonds',
     'buy dry fruits online Pakistan',
@@ -57,9 +58,9 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "Tumanza — Nature's Finest Organic Nuts & Seeds",
+    title: "Tumanza — Natural Wellness & Organic Products",
     description:
-      'Handpicked organic nuts, herbs & superfoods from Gilgit-Baltistan. Pure, raw, delivered across Pakistan.',
+      'Discover premium Shilajit, wild herbal tea, dry fruits and Nuts. Natural goodness, carefully sourced for better living.',
     url: absoluteUrl('/'),
     siteName: 'Tumanza',
     locale: 'en_PK',
@@ -69,15 +70,15 @@ export const metadata: Metadata = {
         url: '/img/hero.jpg',
         width: 1200,
         height: 630,
-        alt: 'Tumanza organic nuts and superfoods',
+        alt: 'Tumanza natural wellness and organic products',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Tumanza — Nature's Finest Organic Nuts & Seeds",
+    title: "Tumanza — Natural Wellness & Organic Products",
     description:
-      'Handpicked organic nuts, herbs & superfoods from Gilgit-Baltistan. Delivered across Pakistan.',
+      'Discover premium Shilajit, wild herbal tea, dry fruits and Nuts. Natural goodness, carefully sourced for better living.',
     images: ['/img/hero.jpg'],
   },
   robots: {

@@ -81,10 +81,10 @@ export default function HomePage() {
         <div className="hero-inner">
           <div className="hero-content">
             <p className="hero-subtitle">100% ORGANIC</p>
-            <h1 className="hero-title">Nature&apos;s Finest Organic Nuts &amp; Seeds</h1>
+            <h1 className="hero-title">NATURAL WELLNESS &amp; ORGANIC PRODUCTS</h1>
             <p className="hero-text">
-              Handpicked from the best farms around the world. Pure, raw, and packed with natural
-              goodness for a healthier you.
+              Discover premium Shilajit, wild herbal tea, dry fruits and Nuts. Natural goodness,
+              carefully sourced for better living.
             </p>
             <Link href="/products" className="btn btn-white">
               SHOP NOW

@@ -1,5 +1,5 @@
 export const SITE_NAME = 'Tumanza';
-export const SITE_TAGLINE = "Nature's Finest Organic Nuts & Superfoods";
+export const SITE_TAGLINE = "Natural Wellness & Organic Products";
 export const FREE_SHIPPING_THRESHOLD = 5933;
 export const STANDARD_SHIPPING_FEE = 5;
 

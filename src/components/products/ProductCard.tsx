@@ -33,7 +33,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       onClick={() => router.push(href)}
       style={{ cursor: 'pointer' }}
     >
-      <div className="product-img relative block h-64 overflow-hidden">
+      <div className="product-img relative block h-[22rem] overflow-hidden">
         <Image
           src={displayImage}
           alt={`${product.name} — buy online at Tumanza`}
