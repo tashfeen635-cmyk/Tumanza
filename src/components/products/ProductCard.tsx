@@ -33,14 +33,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       onClick={() => router.push(href)}
       style={{ cursor: 'pointer' }}
     >
-      <div className="product-img relative block h-[22rem] overflow-hidden">
+      <div className="product-img relative block aspect-square md:aspect-auto md:h-[26rem] overflow-hidden">
         <Image
           src={displayImage}
           alt={`${product.name} — buy online at Tumanza`}
           fill
-          sizes="(max-width: 768px) 100vw, 33vw"
+          sizes="(max-width: 768px) 50vw, 33vw"
           loading="lazy"
-          className="object-cover"
+          className="object-contain md:object-cover p-2 md:p-0"
         />
         {product.badge && (
           <span className={`product-badge ${product.badge.toLowerCase()}`}>

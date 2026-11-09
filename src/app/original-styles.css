@@ -1378,11 +1378,12 @@ header {
   position: relative;
   overflow: hidden;
   background: var(--primary-light);
+  height: 26rem;
 }
 
 .product-img img {
   width: 100%;
-  height: 380px;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.6s ease;
 }
@@ -3155,6 +3156,12 @@ header {
     transform: translateY(0);
   }
 
+  .btn-card-details {
+    border-radius: 90px;
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
   .section-header {
     margin-bottom: 40px;
   }
@@ -3271,8 +3278,15 @@ header {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .product-img {
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+
   .product-img img {
-    height: 220px;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
   }
 
   .product-name {
