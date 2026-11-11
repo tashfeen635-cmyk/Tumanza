@@ -12,6 +12,13 @@ interface ProductCardProps {
   product: ProductItem;
 }
 
+const truncateDescription = (desc: string, maxLen = 153) => {
+  if (!desc) return '';
+  const trimmed = desc.trim();
+  if (trimmed.length <= maxLen) return trimmed;
+  return trimmed.slice(0, maxLen).trim() + '...';
+};
+
 export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
   const { toggleWishlist, isInWishlist } = useStore();
@@ -26,6 +33,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       : product.image;
 
   const starsHtml = '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+
+  const displayDescription = product.description ? truncateDescription(product.description, 153) : '';
 
   return (
     <article
@@ -84,7 +93,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           </Link>
         </h3>
         {product.urduName && <span className="product-name-urdu">{product.urduName}</span>}
-        {product.description && <p className="product-desc">{product.description}</p>}
+        <p className="product-desc">{displayDescription || '\u00A0'}</p>
         <div className="product-rating">
           <span className="stars">{starsHtml}</span>
           {product.reviewCount && product.reviewCount > 0 ? (

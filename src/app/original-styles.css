@@ -1474,6 +1474,12 @@ header {
   color: var(--gray-light);
   margin-bottom: 8px;
   padding: 0 5px;
+  height: 4.5em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 }
 
 .product-rating {

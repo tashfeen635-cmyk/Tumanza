@@ -109,6 +109,36 @@ export default function RootLayout({
         <link rel="preload" as="image" href="/img/hero.webp" type="image/webp" media="(min-width: 769px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/img/hero.jpg" type="image/jpeg" media="(min-width: 769px)" fetchPriority="high" />
         <link rel="preload" as="image" href="/img/hero-mobile.jpg" type="image/jpeg" media="(max-width: 768px)" fetchPriority="high" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (typeof window !== 'undefined') {
+                  const clean = () => {
+                    const els = document.querySelectorAll('[bis_skin_checked]');
+                    for (let i = 0; i < els.length; i++) {
+                      els[i].removeAttribute('bis_skin_checked');
+                    }
+                  };
+                  clean();
+                  const observer = new MutationObserver((mutations) => {
+                    for (let i = 0; i < mutations.length; i++) {
+                      const m = mutations[i];
+                      if (m.type === 'attributes' && m.attributeName === 'bis_skin_checked') {
+                        m.target.removeAttribute('bis_skin_checked');
+                      }
+                    }
+                  });
+                  observer.observe(document.documentElement, {
+                    attributes: true,
+                    subtree: true,
+                    attributeFilter: ['bis_skin_checked']
+                  });
+                }
+              })();
+            `,
+          }}
+        />
       </head>
       <body suppressHydrationWarning>
         <JsonLd data={organizationJsonLd()} />
