@@ -9,7 +9,7 @@ import { productSlug } from '@/lib/seo';
 
 export default function SearchOverlay() {
   const router = useRouter();
-  const { searchOpen, setSearchOpen, allProducts } = useStore();
+  const { searchOpen, setSearchOpen, allProducts, quickSearchTags } = useStore();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ProductItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -110,6 +110,29 @@ export default function SearchOverlay() {
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', color: '#666', fontWeight: 600, textTransform: 'uppercase', marginRight: '4px' }}>Popular:</span>
+            {quickSearchTags.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => handleSearch(tag)}
+                style={{
+                  background: query.toLowerCase() === tag.toLowerCase() ? '#541d2b' : '#f5f0eb',
+                  color: query.toLowerCase() === tag.toLowerCase() ? '#fff' : '#444',
+                  border: '1px solid #e5dbcd',
+                  borderRadius: '20px',
+                  padding: '4px 12px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {tag}
+              </button>
+            ))}
           </div>
 
           <div

@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useStore } from '@/context/StoreContext';
 import {
   ProductCard,
-  InlineSearch,
   Features,
   Newsletter,
 } from '@/components';
 
 export default function ProductsPage() {
-  const { allProducts } = useStore();
+  const { allProducts, collectionCategories: categories } = useStore();
 
   const [category, setCategory] = useState('');
   const [priceRange, setPriceRange] = useState('');
@@ -18,8 +17,6 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
-
-  const categories = ['Nuts', 'Herbs & Supplements', 'Teas', 'Mixes & Butters', 'Spices'];
 
   // Filter and sort products
   const filteredProducts = useMemo(() => {
@@ -95,9 +92,6 @@ export default function ProductsPage() {
           </div>
         </div>
       </section>
-
-      {/* ========== INLINE SEARCH BAR + FILTERS ========== */}
-      <InlineSearch />
 
       {/* Filter controls */}
       <div className="container" style={{ marginTop: '20px', marginBottom: '10px' }}>

@@ -1372,6 +1372,18 @@ header {
 .product-card {
   position: relative;
   cursor: pointer;
+  background: var(--white);
+  border: 1px solid #e9dfcb;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 35px rgba(84, 29, 43, 0.12);
+  border-color: #541d2b;
 }
 
 .product-img {
@@ -1487,7 +1499,7 @@ header {
 }
 
 .stars {
-  color: var(--accent);
+  color: #ffb400;
   font-size: 14px;
   letter-spacing: 2px;
 }

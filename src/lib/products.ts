@@ -45,17 +45,25 @@ async function getReviewStatsMap(): Promise<Record<string, { avg: number; count:
 
 export const getAllProducts = unstable_cache(
   async (): Promise<ProductItem[]> => {
-    await connectDB();
-    const products = await Product.find().lean();
-    const statsMap = await getReviewStatsMap();
-    const mapped = products.map((p: any) => mapProduct(p, statsMap));
-    mapped.sort((a, b) => {
-      const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
-      const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
-      if (soA !== soB) return soA - soB;
-      return a._id.localeCompare(b._id);
-    });
-    return JSON.parse(JSON.stringify(mapped));
+    if (process.env.NEXT_PHASE === 'phase-production-build') {
+      return [];
+    }
+    try {
+      await connectDB();
+      const products = await Product.find().lean();
+      const statsMap = await getReviewStatsMap();
+      const mapped = products.map((p: any) => mapProduct(p, statsMap));
+      mapped.sort((a, b) => {
+        const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
+        const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
+        if (soA !== soB) return soA - soB;
+        return a._id.localeCompare(b._id);
+      });
+      return JSON.parse(JSON.stringify(mapped));
+    } catch (e) {
+      console.warn('[getAllProducts] DB connection failed, returning empty array:', e);
+      return [];
+    }
   },
   ['all-products-cache'],
   { revalidate: 60, tags: ['products'] }

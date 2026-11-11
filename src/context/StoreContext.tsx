@@ -8,6 +8,8 @@ interface StoreContextType {
   token: string | null;
   wishlist: string[];
   allProducts: ProductItem[];
+  quickSearchTags: string[];
+  collectionCategories: string[];
   selectedProduct: ProductItem | null;
   orderProduct: ProductItem | null;
   activePolicy: string | null;
@@ -33,12 +35,26 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
   const [token, setToken] = useState<string | null>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [allProducts, setAllProducts] = useState<ProductItem[]>(initialProducts);
+  const [quickSearchTags, setQuickSearchTags] = useState<string[]>(() => {
+    try {
+      const cached = localStorage.getItem('tumanza_quick_tags');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return ['Almonds', 'Seeds', 'Herbs', 'Tea', 'Shilajit'];
+  });
+  const [collectionCategories, setCollectionCategories] = useState<string[]>(() => {
+    try {
+      const cached = localStorage.getItem('tumanza_collection_cats');
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return ['Nuts', 'Herbs & Supplements', 'Teas', 'Mixes & Butters', 'Spices'];
+  });
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
   const [orderProduct, setOrderProduct] = useState<ProductItem | null>(null);
   const [activePolicy, setActivePolicy] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Initialize Auth & Wishlist from localStorage
+  // Initialize Auth & Wishlist & Tags from localStorage / API
   useEffect(() => {
     try {
       const savedToken = localStorage.getItem('peaknuts_user_token');
@@ -73,6 +89,26 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
     } catch {}
 
     refreshProducts();
+
+    fetch('/api/tags')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setQuickSearchTags(data);
+          localStorage.setItem('tumanza_quick_tags', JSON.stringify(data));
+        }
+      })
+      .catch(() => {});
+
+    fetch('/api/categories')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCollectionCategories(data);
+          localStorage.setItem('tumanza_collection_cats', JSON.stringify(data));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const refreshProducts = async () => {
@@ -198,6 +234,8 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
         token,
         wishlist,
         allProducts,
+        quickSearchTags,
+        collectionCategories,
         selectedProduct,
         orderProduct,
         activePolicy,

@@ -24,6 +24,7 @@ import {
   RefreshCw,
   Upload,
   Loader2,
+  Tag,
 } from 'lucide-react';
 import { ProductItem, OrderRecord, SubscriberRecord } from '@/lib/types';
 
@@ -38,7 +39,7 @@ export default function AdminPage() {
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState<
-    'dashboard' | 'products' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics'
+    'dashboard' | 'products' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics' | 'tags' | 'categories'
   >('dashboard');
 
   // Cached data
@@ -52,6 +53,16 @@ export default function AdminPage() {
     labels: [],
     values: [],
   });
+  const [quickSearchTags, setQuickSearchTags] = useState<string[]>(['Almonds', 'Seeds', 'Herbs', 'Tea', 'Shilajit']);
+  const [newTagInput, setNewTagInput] = useState('');
+  const [collectionCategories, setCollectionCategories] = useState<string[]>([
+    'Nuts',
+    'Herbs & Supplements',
+    'Teas',
+    'Mixes & Butters',
+    'Spices',
+  ]);
+  const [newCategoryInput, setNewCategoryInput] = useState('');
 
   const [loadingData, setLoadingData] = useState(false);
 
@@ -103,7 +114,7 @@ export default function AdminPage() {
     const headers = { Authorization: `Bearer ${adminToken}` };
 
     try {
-      const [prodsRes, ordsRes, subsRes, revRes, usersRes, revsRes, anaRes] = await Promise.all([
+      const [prodsRes, ordsRes, subsRes, revRes, usersRes, revsRes, anaRes, tagsRes, catsRes] = await Promise.all([
         fetch('/api/products', { cache: 'no-store' }),
         fetch('/api/orders', { headers, cache: 'no-store' }),
         fetch('/api/subscribers', { headers, cache: 'no-store' }),
@@ -111,6 +122,8 @@ export default function AdminPage() {
         fetch('/api/admin/users', { headers, cache: 'no-store' }),
         fetch('/api/admin/reviews', { headers, cache: 'no-store' }),
         fetch('/api/admin/analytics', { headers, cache: 'no-store' }),
+        fetch('/api/tags', { cache: 'no-store' }),
+        fetch('/api/categories', { cache: 'no-store' }),
       ]);
 
       if (prodsRes.ok) setProducts(await prodsRes.json());
@@ -120,6 +133,14 @@ export default function AdminPage() {
       if (usersRes.ok) setUsersList(await usersRes.json());
       if (revsRes.ok) setReviewsList(await revsRes.json());
       if (anaRes.ok) setAnalyticsData(await anaRes.json());
+      if (tagsRes.ok) {
+        const tagsData = await tagsRes.json();
+        if (Array.isArray(tagsData)) setQuickSearchTags(tagsData);
+      }
+      if (catsRes.ok) {
+        const catsData = await catsRes.json();
+        if (Array.isArray(catsData)) setCollectionCategories(catsData);
+      }
     } catch (e) {
       console.error('Failed to load admin data:', e);
     } finally {
@@ -488,6 +509,8 @@ export default function AdminPage() {
             { id: 'users', name: 'Users', icon: Users, count: usersList.length },
             { id: 'reviews', name: 'Reviews', icon: Star, count: reviewsList.length },
             { id: 'analytics', name: 'Analytics', icon: BarChart3 },
+            { id: 'tags', name: 'Quick Search Tags', icon: Tag, count: quickSearchTags.length },
+            { id: 'categories', name: 'Collection Categories', icon: Package, count: collectionCategories.length },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -1118,6 +1141,200 @@ export default function AdminPage() {
             )}
           </div>
         )}
+
+        {/* ================= SECTION: QUICK SEARCH TAGS ================= */}
+        {activeSection === 'tags' && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Quick Search Tags</h1>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Add, remove, or edit the quick search filter tabs displayed in the top search overlay
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 max-w-xl space-y-6">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="New tag name (e.g. Honey)"
+                  value={newTagInput}
+                  onChange={(e) => setNewTagInput(e.target.value)}
+                  className="flex-1 text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const trimmed = newTagInput.trim();
+                    if (!trimmed) return;
+                    if (quickSearchTags.map(t => t.toLowerCase()).includes(trimmed.toLowerCase())) {
+                      alert('Tag already exists!');
+                      return;
+                    }
+                    setQuickSearchTags([...quickSearchTags, trimmed]);
+                    setNewTagInput('');
+                  }}
+                  className="px-5 py-3 bg-brand-charcoal hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow transition-colors"
+                >
+                  Add Tag
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">Current Tags:</label>
+                <div className="flex flex-wrap gap-2">
+                  {quickSearchTags.map((tag, idx) => (
+                    <div
+                      key={idx}
+                      className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full text-xs font-semibold text-brand-charcoal"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setQuickSearchTags(quickSearchTags.filter((_, i) => i !== idx));
+                        }}
+                        className="text-red-500 hover:text-red-700 p-0.5"
+                        title="Remove tag"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  {quickSearchTags.length === 0 && (
+                    <p className="text-xs text-gray-400 italic">No tags added yet.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!adminToken) return;
+                    try {
+                      const res = await fetch('/api/tags', {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${adminToken}`,
+                        },
+                        body: JSON.stringify({ tags: quickSearchTags }),
+                      });
+                      if (res.ok) {
+                        alert('Quick search tags updated successfully!');
+                      } else {
+                        const d = await res.json();
+                        alert(d.error || 'Failed to update tags');
+                      }
+                    } catch {
+                      alert('Network error saving tags.');
+                    }
+                  }}
+                  className="w-full py-3 bg-accent hover:bg-brand-darkgreen text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow transition-colors"
+                >
+                  Save Changes to Store
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= SECTION: COLLECTION CATEGORIES ================= */}
+        {activeSection === 'categories' && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Collection Categories</h1>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Add, remove, or edit the filter tabs &amp; categories for &quot;Tumanza&apos;s Collection&quot; &amp; products page
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 max-w-xl space-y-6">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="New category name (e.g. Honey & Oils)"
+                  value={newCategoryInput}
+                  onChange={(e) => setNewCategoryInput(e.target.value)}
+                  className="flex-1 text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const trimmed = newCategoryInput.trim();
+                    if (!trimmed) return;
+                    if (collectionCategories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
+                      alert('Category already exists!');
+                      return;
+                    }
+                    setCollectionCategories([...collectionCategories, trimmed]);
+                    setNewCategoryInput('');
+                  }}
+                  className="px-5 py-3 bg-brand-charcoal hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow transition-colors"
+                >
+                  Add Category
+                </button>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">Current Categories:</label>
+                <div className="flex flex-wrap gap-2">
+                  {collectionCategories.map((cat, idx) => (
+                    <div
+                      key={idx}
+                      className="inline-flex items-center gap-2 bg-gray-100 border border-gray-200 px-3 py-1.5 rounded-full text-xs font-semibold text-brand-charcoal"
+                    >
+                      <span>{cat}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCollectionCategories(collectionCategories.filter((_, i) => i !== idx));
+                        }}
+                        className="text-red-500 hover:text-red-700 p-0.5"
+                        title="Remove category"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  {collectionCategories.length === 0 && (
+                    <p className="text-xs text-gray-400 italic">No categories added yet.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!adminToken) return;
+                    try {
+                      const res = await fetch('/api/categories', {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${adminToken}`,
+                        },
+                        body: JSON.stringify({ categories: collectionCategories }),
+                      });
+                      if (res.ok) {
+                        alert('Collection categories updated successfully!');
+                      } else {
+                        const d = await res.json();
+                        alert(d.error || 'Failed to update categories');
+                      }
+                    } catch {
+                      alert('Network error saving categories.');
+                    }
+                  }}
+                  className="w-full py-3 bg-accent hover:bg-brand-darkgreen text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow transition-colors"
+                >
+                  Save Categories to Store
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* ================= MODAL: ADD / EDIT PRODUCT ================= */}
@@ -1170,11 +1387,9 @@ export default function AdminPage() {
                     onChange={(e) => setProdFormData({ ...prodFormData, category: e.target.value })}
                     className="w-full p-2.5 rounded-lg border border-gray-300 bg-white focus:outline-none focus:border-brand-charcoal"
                   >
-                    <option value="Nuts">Nuts</option>
-                    <option value="Herbs & Supplements">Herbs & Supplements</option>
-                    <option value="Teas">Teas</option>
-                    <option value="Mixes & Butters">Mixes & Butters</option>
-                    <option value="Spices">Spices</option>
+                    {collectionCategories.map((cat) => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
                   </select>
                 </div>
                 <div>

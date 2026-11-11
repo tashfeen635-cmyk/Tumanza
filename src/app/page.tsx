@@ -5,20 +5,27 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import {
-  InlineSearch,
   ProductCard,
   Features,
   Newsletter,
 } from '@/components';
 
 export default function HomePage() {
-  const { allProducts } = useStore();
+  const { allProducts, collectionCategories } = useStore();
+  const [selectedCollectionCategory, setSelectedCollectionCategory] = React.useState('All');
+
+  const collectionCategoriesList = ['All', ...collectionCategories];
 
   const popularProducts = allProducts.filter(
     (p) => !p.section || p.section === 'popular' || p.section === 'trending' || p.section === 'bestselling'
   );
   const baseProducts = popularProducts.length > 0 ? popularProducts : allProducts;
-  const displayProducts = baseProducts.slice(0, 6);
+
+  const filteredCollectionProducts = selectedCollectionCategory === 'All'
+    ? baseProducts
+    : baseProducts.filter((p) => p.category === selectedCollectionCategory);
+
+  const displayProducts = filteredCollectionProducts.slice(0, 6);
 
   const testimonials = [
     {
@@ -93,24 +100,64 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ========== INLINE SEARCH BAR ========== */}
-      <InlineSearch />
-
       {/* ========== POPULAR PRODUCTS ========== */}
       <section className="products-section" id="shop" data-section-name="popular">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Tumanza&apos;s Collection</h2>
             <p className="section-subtitle">
-              Our most loved organic nuts that customers keep coming back for
+              Our most loved organic nuts and wellness products that customers keep coming back for
             </p>
           </div>
+
+          {/* Collection Category Filter Tabs */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              gap: '10px',
+              marginBottom: '35px',
+            }}
+          >
+            {collectionCategoriesList.map((cat) => {
+              const isActive = selectedCollectionCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCollectionCategory(cat)}
+                  style={{
+                    padding: '8px 18px',
+                    borderRadius: '30px',
+                    fontSize: '12px',
+                    fontWeight: isActive ? 600 : 400,
+                    letterSpacing: '1px',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    background: isActive ? '#541d2b' : '#f9f6f0',
+                    color: isActive ? '#fff' : '#5d5b5b',
+                    border: isActive ? '1px solid #541d2b' : '1px solid #e5dbcd',
+                    boxShadow: isActive ? '0 4px 12px rgba(84, 29, 43, 0.2)' : 'none',
+                  }}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="products-grid" id="popularGrid">
             {displayProducts.map((p) => (
               <ProductCard key={p._id} product={p} />
             ))}
           </div>
-          {displayProducts.length > 0 && (
+          {filteredCollectionProducts.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#999' }}>
+              <p>No products found in this category.</p>
+            </div>
+          )}
+          {baseProducts.length > 0 && (
             <div style={{ textAlign: 'center', marginTop: '45px' }}>
               <Link href="/products" className="btn btn-primary">
                 MORE PRODUCTS
