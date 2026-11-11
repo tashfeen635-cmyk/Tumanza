@@ -28,11 +28,11 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-export const StoreProvider = ({ children }: { children: ReactNode }) => {
+export const StoreProvider = ({ children, initialProducts = [] }: { children: ReactNode; initialProducts?: ProductItem[] }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [allProducts, setAllProducts] = useState<ProductItem[]>([]);
+  const [allProducts, setAllProducts] = useState<ProductItem[]>(initialProducts);
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(null);
   const [orderProduct, setOrderProduct] = useState<ProductItem | null>(null);
   const [activePolicy, setActivePolicy] = useState<string | null>(null);

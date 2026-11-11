@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { connectDB } from '@/lib/db';
 import { Product, Review } from '@/models';
 import { requireAdmin, sanitizeProduct } from '@/lib/auth';
@@ -74,8 +74,10 @@ export async function POST(request: Request) {
 
     await connectDB();
     const product = await Product.create(data);
-    revalidatePath('/');
-    revalidatePath('/shop');
+    revalidateTag('products', 'default');
+    revalidatePath('/', 'page');
+    revalidatePath('/shop', 'page');
+    revalidatePath('/products', 'page');
     revalidatePath('/product/[slug]', 'page');
     return NextResponse.json(product, { status: 201 });
   } catch (err: any) {

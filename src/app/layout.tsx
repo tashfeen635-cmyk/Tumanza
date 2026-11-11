@@ -7,6 +7,7 @@ import { Header, Footer } from '@/components';
 import JsonLd from '@/components/seo/JsonLd';
 import { organizationJsonLd } from '@/lib/seo';
 import { absoluteUrl, getSiteUrl } from '@/lib/site';
+import { getAllProducts } from '@/lib/products';
 
 const SearchOverlay = dynamic(() => import('@/components/modals/SearchOverlay'));
 const ProductModal = dynamic(() => import('@/components/modals/ProductModal'));
@@ -98,11 +99,12 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const initialProducts = await getAllProducts().catch(() => []);
   return (
     <html lang="en" className={`${marcellus.variable} ${openSans.variable}`} suppressHydrationWarning>
       <head>
@@ -142,7 +144,7 @@ export default function RootLayout({
       </head>
       <body suppressHydrationWarning>
         <JsonLd data={organizationJsonLd()} />
-        <StoreProvider>
+        <StoreProvider initialProducts={initialProducts}>
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />

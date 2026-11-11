@@ -3,6 +3,7 @@ import { Product, Review } from '@/models';
 import { ProductItem } from '@/lib/types';
 import { extractIdSuffixFromSlug, resolveProductImage } from '@/lib/seo';
 import mongoose from 'mongoose';
+import { unstable_cache } from 'next/cache';
 
 function mapProduct(p: any, statsMap: Record<string, { avg: number; count: number }>): ProductItem {
   const id = p._id.toString();
@@ -42,45 +43,41 @@ async function getReviewStatsMap(): Promise<Record<string, { avg: number; count:
   return statsMap;
 }
 
-export async function getAllProducts(): Promise<ProductItem[]> {
-  await connectDB();
-  const products = await Product.find().lean();
-  const statsMap = await getReviewStatsMap();
-  const mapped = products.map((p: any) => mapProduct(p, statsMap));
-  mapped.sort((a, b) => {
-    const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
-    const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
-    if (soA !== soB) return soA - soB;
-    return a._id.localeCompare(b._id);
-  });
-  return mapped;
-}
+export const getAllProducts = unstable_cache(
+  async (): Promise<ProductItem[]> => {
+    await connectDB();
+    const products = await Product.find().lean();
+    const statsMap = await getReviewStatsMap();
+    const mapped = products.map((p: any) => mapProduct(p, statsMap));
+    mapped.sort((a, b) => {
+      const soA = (a.sortOrder && a.sortOrder > 0) ? a.sortOrder : 999999;
+      const soB = (b.sortOrder && b.sortOrder > 0) ? b.sortOrder : 999999;
+      if (soA !== soB) return soA - soB;
+      return a._id.localeCompare(b._id);
+    });
+    return JSON.parse(JSON.stringify(mapped));
+  },
+  ['all-products-cache'],
+  { revalidate: 60, tags: ['products'] }
+);
 
 export async function getProductById(id: string): Promise<ProductItem | null> {
   if (!mongoose.Types.ObjectId.isValid(id)) return null;
-  await connectDB();
-  const p = await Product.findById(id).lean();
-  if (!p) return null;
-  const statsMap = await getReviewStatsMap();
-  return mapProduct(p, statsMap);
+  const products = await getAllProducts();
+  return products.find((p) => p._id === id) || null;
 }
 
 /** Resolve /product/[slug] using trailing id suffix or full ObjectId */
 export async function getProductBySlug(slug: string): Promise<ProductItem | null> {
   if (!slug) return null;
+  const products = await getAllProducts();
 
   if (mongoose.Types.ObjectId.isValid(slug)) {
-    return getProductById(slug);
+    return products.find((p) => p._id === slug) || null;
   }
 
   const suffix = extractIdSuffixFromSlug(slug);
   if (!suffix || suffix.length < 6) return null;
 
-  await connectDB();
-  const products = await Product.find().lean();
-  const match = products.find((p: any) => p._id.toString().toLowerCase().endsWith(suffix));
-  if (!match) return null;
-
-  const statsMap = await getReviewStatsMap();
-  return mapProduct(match, statsMap);
+  return products.find((p: any) => p._id.toLowerCase().endsWith(suffix)) || null;
 }

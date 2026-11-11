@@ -40,5 +40,9 @@ const productSchema = new Schema<IProduct>({
   returnPolicy: { type: String, default: '' },
 });
 
+productSchema.index({ sortOrder: 1, _id: 1 });
+productSchema.index({ category: 1 });
+productSchema.index({ price: 1 });
+
 export const Product: Model<IProduct> =
   mongoose.models.Product || mongoose.model<IProduct>('Product', productSchema);

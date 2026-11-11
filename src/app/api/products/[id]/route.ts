@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { Product } from '@/models';
@@ -37,8 +37,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    revalidatePath('/');
-    revalidatePath('/shop');
+    revalidateTag('products', 'default');
+    revalidatePath('/', 'page');
+    revalidatePath('/shop', 'page');
+    revalidatePath('/products', 'page');
     revalidatePath('/product/[slug]', 'page');
     return NextResponse.json(product);
   } catch (err: any) {
@@ -69,8 +71,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    revalidatePath('/');
-    revalidatePath('/shop');
+    revalidateTag('products', 'default');
+    revalidatePath('/', 'page');
+    revalidatePath('/shop', 'page');
+    revalidatePath('/products', 'page');
     revalidatePath('/product/[slug]', 'page');
     return NextResponse.json({ message: 'Deleted' });
   } catch (err: any) {
