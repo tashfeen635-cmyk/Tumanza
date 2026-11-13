@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/api/', '/account'],
+        disallow: ['/tumanza-control-7x9p', '/api/', '/account'],
       },
     ],
     sitemap: `${base}/sitemap.xml`,

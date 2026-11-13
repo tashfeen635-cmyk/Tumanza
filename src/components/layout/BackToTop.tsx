@@ -20,7 +20,7 @@ export default function BackToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (pathname?.startsWith('/admin') || !visible) return null;
+  if (pathname?.startsWith('/tumanza-control-7x9p') || !visible) return null;
 
   return (
     <button

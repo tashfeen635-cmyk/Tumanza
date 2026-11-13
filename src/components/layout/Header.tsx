@@ -20,7 +20,7 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/tumanza-control-7x9p')) {
     return null;
   }
 

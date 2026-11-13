@@ -39,7 +39,7 @@ function json(body) {
   await check('server.js not served', '/server.js', {}, 404);
   await check('package.json not served', '/package.json', {}, 404);
   await check('env not served', '/.env', {}, 404);
-  await check('admin page reachable', '/admin', {}, [200, 308]);
+  await check('admin page reachable', '/tumanza-control-7x9p', {}, [200, 308]);
   await check('homepage reachable', '/', {}, [200, 308]);
   await check('unknown product rejected', '/api/orders', json({
     customer: 'Test', email: 'test@example.com', phone: '000', city: 'X', address: 'Y',

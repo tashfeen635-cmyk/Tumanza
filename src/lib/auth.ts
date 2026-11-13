@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { connectDB } from './db';
-import { Token, UserToken, User, IUser } from '@/models';
+import { Token, UserToken, User, IUser, Setting } from '@/models';
 
 export function escapeHtml(value: unknown): string {
   return String(value == null ? '' : value)
@@ -48,6 +48,64 @@ export async function verifyPassword(password: string, hash: string, salt: strin
   const hashBuffer = Buffer.from(hash, 'hex');
   if (derived.length !== hashBuffer.length) return false;
   return crypto.timingSafeEqual(derived, hashBuffer);
+}
+
+export const ADMIN_CREDENTIALS_KEY = 'admin_credentials';
+
+export interface StoredAdminCredentials {
+  username: string;
+  passwordHash: string;
+  salt: string;
+}
+
+export async function getStoredAdminCredentials(): Promise<StoredAdminCredentials | null> {
+  await connectDB();
+  const doc = await Setting.findOne({ key: ADMIN_CREDENTIALS_KEY }).lean();
+  const value: any = doc?.value;
+  if (
+    value &&
+    typeof value.username === 'string' &&
+    typeof value.passwordHash === 'string' &&
+    typeof value.salt === 'string'
+  ) {
+    return { username: value.username, passwordHash: value.passwordHash, salt: value.salt };
+  }
+  return null;
+}
+
+export async function isAdminConfigured(): Promise<boolean> {
+  const stored = await getStoredAdminCredentials();
+  if (stored) return true;
+  return Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD);
+}
+
+export async function getAdminUsername(): Promise<string | null> {
+  const stored = await getStoredAdminCredentials();
+  if (stored) return stored.username;
+  return process.env.ADMIN_USERNAME || null;
+}
+
+export async function verifyAdminPassword(password: string): Promise<boolean> {
+  if (typeof password !== 'string') return false;
+  const stored = await getStoredAdminCredentials();
+  if (stored) {
+    return verifyPassword(password, stored.passwordHash, stored.salt);
+  }
+  const envPassword = process.env.ADMIN_PASSWORD;
+  return Boolean(envPassword) && safeEqual(password, envPassword as string);
+}
+
+export async function verifyAdminLogin(username: string, password: string): Promise<boolean> {
+  if (typeof username !== 'string' || typeof password !== 'string') return false;
+  const stored = await getStoredAdminCredentials();
+  if (stored) {
+    if (!safeEqual(username, stored.username)) return false;
+    return verifyPassword(password, stored.passwordHash, stored.salt);
+  }
+  const envUsername = process.env.ADMIN_USERNAME;
+  const envPassword = process.env.ADMIN_PASSWORD;
+  if (!envUsername || !envPassword) return false;
+  return safeEqual(username, envUsername) && safeEqual(password, envPassword);
 }
 
 export function sanitizeProduct(body: any) {

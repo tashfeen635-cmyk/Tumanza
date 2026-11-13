@@ -10,7 +10,7 @@ export default function Footer() {
   const pathname = usePathname();
   const { openPolicyModal } = useStore();
 
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/tumanza-control-7x9p')) {
     return null;
   }
 

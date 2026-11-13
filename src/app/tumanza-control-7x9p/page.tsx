@@ -18,6 +18,7 @@ import {
   Pencil,
   Trash2,
   Eye,
+  EyeOff,
   CheckCircle,
   AlertCircle,
   X,
@@ -26,8 +27,12 @@ import {
   Loader2,
   Tag,
   Award,
+  KeyRound,
 } from 'lucide-react';
 import { ProductItem, OrderRecord, SubscriberRecord } from '@/lib/types';
+import SignatureProductEditor from '@/components/admin/SignatureProductEditor';
+import AdminNotifications from '@/components/admin/AdminNotifications';
+import { unlockNotificationAudio } from '@/lib/notificationSound';
 
 export default function AdminPage() {
   const [adminToken, setAdminToken] = useState<string | null>(null);
@@ -35,13 +40,26 @@ export default function AdminPage() {
   // Login form
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [lockSeconds, setLockSeconds] = useState(0);
   const [loggingIn, setLoggingIn] = useState(false);
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState<
-    'dashboard' | 'products' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics' | 'tags' | 'categories'
+    'dashboard' | 'products' | 'signature' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics' | 'tags' | 'categories' | 'settings'
   >('dashboard');
+
+  // Account settings
+  const [settingsUsername, setSettingsUsername] = useState('');
+  const [settingsCurrentPassword, setSettingsCurrentPassword] = useState('');
+  const [settingsNewPassword, setSettingsNewPassword] = useState('');
+  const [settingsConfirmPassword, setSettingsConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsMessage, setSettingsMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Cached data
   const [products, setProducts] = useState<ProductItem[]>([]);
@@ -102,11 +120,60 @@ export default function AdminPage() {
     }
   }, []);
 
+  // Restore an active login lock countdown after a refresh
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('peaknuts_admin_lock_until');
+      if (!raw) return;
+      const remaining = Math.ceil((Number(raw) - Date.now()) / 1000);
+      if (remaining > 0) {
+        setLockSeconds(remaining);
+      } else {
+        localStorage.removeItem('peaknuts_admin_lock_until');
+      }
+    } catch {}
+  }, []);
+
+  // Countdown for the 1-minute lockout after three failed attempts
+  useEffect(() => {
+    if (lockSeconds <= 0) return;
+    const timer = window.setTimeout(() => {
+      setLockSeconds((seconds) => Math.max(0, seconds - 1));
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [lockSeconds]);
+
+  useEffect(() => {
+    if (lockSeconds > 0) return;
+    try {
+      const raw = localStorage.getItem('peaknuts_admin_lock_until');
+      if (raw && Number(raw) <= Date.now()) {
+        localStorage.removeItem('peaknuts_admin_lock_until');
+      }
+    } catch {}
+  }, [lockSeconds]);
+
   // Fetch admin data when token is set
   useEffect(() => {
     if (adminToken) {
       fetchAllData();
     }
+  }, [adminToken]);
+
+  // Load current admin username for account settings
+  useEffect(() => {
+    if (!adminToken) return;
+    fetch('/api/admin/account', {
+      headers: { Authorization: `Bearer ${adminToken}` },
+      cache: 'no-store',
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data && typeof data.username === 'string') {
+          setSettingsUsername(data.username);
+        }
+      })
+      .catch(() => {});
   }, [adminToken]);
 
   const fetchAllData = async () => {
@@ -154,6 +221,11 @@ export default function AdminPage() {
     setLoginError('');
     setLoggingIn(true);
 
+    unlockNotificationAudio();
+    if (typeof window !== 'undefined' && 'Notification' in window && window.Notification.permission === 'default') {
+      window.Notification.requestPermission().catch(() => {});
+    }
+
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -165,6 +237,19 @@ export default function AdminPage() {
       if (res.ok && data.token) {
         setAdminToken(data.token);
         localStorage.setItem('peaknuts_admin_token', data.token);
+        setLockSeconds(0);
+        try {
+          localStorage.removeItem('peaknuts_admin_lock_until');
+        } catch {}
+      } else if (res.status === 429 && typeof data.retryAfter === 'number' && data.retryAfter > 0) {
+        try {
+          localStorage.setItem(
+            'peaknuts_admin_lock_until',
+            String(Date.now() + data.retryAfter * 1000)
+          );
+        } catch {}
+        setLockSeconds(data.retryAfter);
+        setLoginError('');
       } else {
         setLoginError(data.error || 'Invalid credentials');
       }
@@ -184,6 +269,51 @@ export default function AdminPage() {
     }
     setAdminToken(null);
     localStorage.removeItem('peaknuts_admin_token');
+  };
+
+  const handleUpdateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminToken) return;
+    setSettingsMessage(null);
+
+    if (settingsNewPassword !== settingsConfirmPassword) {
+      setSettingsMessage({ type: 'error', text: 'New password and confirmation do not match.' });
+      return;
+    }
+
+    setSettingsSaving(true);
+    try {
+      const res = await fetch('/api/admin/account', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({
+          currentPassword: settingsCurrentPassword,
+          newUsername: settingsUsername,
+          newPassword: settingsNewPassword,
+          confirmNewPassword: settingsConfirmPassword,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setSettingsMessage({
+          type: 'success',
+          text: data.message || 'Admin credentials updated successfully.',
+        });
+        setSettingsCurrentPassword('');
+        setSettingsNewPassword('');
+        setSettingsConfirmPassword('');
+        if (data.username) setSettingsUsername(data.username);
+      } else {
+        setSettingsMessage({ type: 'error', text: data.error || 'Failed to update credentials.' });
+      }
+    } catch {
+      setSettingsMessage({ type: 'error', text: 'Network error. Please try again.' });
+    } finally {
+      setSettingsSaving(false);
+    }
   };
 
   // PRODUCT CRUD
@@ -441,28 +571,48 @@ export default function AdminPage() {
 
             <div suppressHydrationWarning>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full text-xs p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
-              />
+              <div className="relative">
+                <input
+                  type={showLoginPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full text-xs p-3 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword((v) => !v)}
+                  aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-charcoal"
+                >
+                  {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
-            {loginError && (
+            {lockSeconds > 0 ? (
               <p className="text-xs text-red-600 bg-red-50 p-2.5 rounded-lg font-medium text-center">
-                {loginError}
+                Too many failed attempts. Try again in {lockSeconds}s.
               </p>
+            ) : (
+              loginError && (
+                <p className="text-xs text-red-600 bg-red-50 p-2.5 rounded-lg font-medium text-center">
+                  {loginError}
+                </p>
+              )
             )}
 
             <button
               type="submit"
-              disabled={loggingIn}
+              disabled={loggingIn || lockSeconds > 0}
               className="w-full py-3 bg-brand-charcoal hover:bg-black text-white text-xs font-bold tracking-widest uppercase rounded-lg shadow transition-colors disabled:opacity-50 mt-2"
             >
-              {loggingIn ? 'Authenticating...' : 'Sign In'}
+              {lockSeconds > 0
+                ? `Try again in ${lockSeconds}s`
+                : loggingIn
+                  ? 'Authenticating...'
+                  : 'Sign In'}
             </button>
           </form>
 
@@ -505,7 +655,7 @@ export default function AdminPage() {
           {[
             { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
             { id: 'products', name: 'Products', icon: Package, count: products.length },
-            { id: 'signature', name: 'Signature Product', icon: Award, href: '/admin/signature-product' },
+            { id: 'signature', name: 'Signature Product', icon: Award },
             { id: 'orders', name: 'Orders', icon: ShoppingCart, count: orders.length },
             { id: 'subscribers', name: 'Subscribers', icon: Mail, count: subscribers.length },
             { id: 'users', name: 'Users', icon: Users, count: usersList.length },
@@ -513,23 +663,10 @@ export default function AdminPage() {
             { id: 'analytics', name: 'Analytics', icon: BarChart3 },
             { id: 'tags', name: 'Quick Search Tags', icon: Tag, count: quickSearchTags.length },
             { id: 'categories', name: 'Collection Categories', icon: Package, count: collectionCategories.length },
+            { id: 'settings', name: 'Account Settings', icon: KeyRound },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-            if (item.href) {
-              return (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </div>
-                </Link>
-              );
-            }
             return (
               <button
                 key={item.id}
@@ -587,6 +724,14 @@ export default function AdminPage() {
 
       {/* Main Content Area */}
       <main className="flex-1 p-6 sm:p-10 overflow-y-auto">
+        {/* Top Bar */}
+        <div className="mb-6 flex items-center justify-end border-b border-gray-200 pb-3">
+          <AdminNotifications
+            adminToken={adminToken}
+            onNavigate={(section) => setActiveSection(section)}
+            variant="light"
+          />
+        </div>
         {/* ================= SECTION: DASHBOARD ================= */}
         {activeSection === 'dashboard' && (
           <div className="space-y-8">
@@ -1348,6 +1493,133 @@ export default function AdminPage() {
                   Save Categories to Store
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= SECTION: SIGNATURE PRODUCT ================= */}
+        {activeSection === 'signature' && adminToken && (
+          <SignatureProductEditor adminToken={adminToken} />
+        )}
+
+        {/* ================= SECTION: ACCOUNT SETTINGS ================= */}
+        {activeSection === 'settings' && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Account Settings</h1>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Update the administrator login username and password
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 max-w-xl">
+              <form onSubmit={handleUpdateAccount} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">New Username *</label>
+                  <input
+                    type="text"
+                    required
+                    autoComplete="username"
+                    value={settingsUsername}
+                    onChange={(e) => setSettingsUsername(e.target.value)}
+                    className="w-full text-xs p-3 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">Current Password *</label>
+                  <div className="relative">
+                    <input
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      required
+                      autoComplete="current-password"
+                      value={settingsCurrentPassword}
+                      onChange={(e) => setSettingsCurrentPassword(e.target.value)}
+                      className="w-full text-xs p-3 pr-10 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowCurrentPassword((v) => !v)}
+                      aria-label={showCurrentPassword ? 'Hide current password' : 'Show current password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-charcoal"
+                    >
+                      {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">New Password *</label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      autoComplete="new-password"
+                      value={settingsNewPassword}
+                      onChange={(e) => setSettingsNewPassword(e.target.value)}
+                      className="w-full text-xs p-3 pr-10 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword((v) => !v)}
+                      aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-charcoal"
+                    >
+                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Confirm New Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      required
+                      minLength={6}
+                      autoComplete="new-password"
+                      value={settingsConfirmPassword}
+                      onChange={(e) => setSettingsConfirmPassword(e.target.value)}
+                      className="w-full text-xs p-3 pr-10 rounded-xl border border-gray-300 focus:outline-none focus:border-brand-charcoal"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-brand-charcoal"
+                    >
+                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {settingsMessage && (
+                  <p
+                    className={`text-xs p-2.5 rounded-lg font-medium ${
+                      settingsMessage.type === 'success'
+                        ? 'text-green-700 bg-green-50'
+                        : 'text-red-600 bg-red-50'
+                    }`}
+                  >
+                    {settingsMessage.text}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={settingsSaving}
+                  className="w-full py-3 bg-accent hover:bg-brand-darkgreen text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow transition-colors disabled:opacity-50"
+                >
+                  {settingsSaving ? 'Saving...' : 'Save Credentials'}
+                </button>
+
+                <p className="text-[11px] text-gray-400">
+                  Your current session stays signed in after updating the credentials.
+                </p>
+              </form>
             </div>
           </div>
         )}

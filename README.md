@@ -11,7 +11,7 @@ A full-stack e-commerce application built with **Next.js (App Router)**, **React
 | `src/app/about/page.tsx` | About Page: Farm origins in Gilgit-Baltistan, mountain harvesters, core values, and transparency |
 | `src/app/contact/page.tsx` | Contact Page: Interactive contact message form, operating hours, and location info |
 | `src/app/account/page.tsx` | User Account: Authentication tabs, 3-step OTP password reset flow, email verification banner, profile updates, order history, and saved wishlist |
-| `src/app/admin/page.tsx` | Admin Portal: Dashboard overview with 4 KPI cards, monthly revenue bar chart, product management (Add/Edit/Delete), order fulfillment & status updating, subscribers list, registered users, review moderation, and sales analytics |
+| `src/app/tumanza-control-7x9p/page.tsx` | Admin Portal: Dashboard overview with 4 KPI cards, monthly revenue bar chart, product management (Add/Edit/Delete), order fulfillment & status updating, subscribers list, registered users, review moderation, and sales analytics |
 | `src/app/api/*` | Next.js Serverless Route Handlers for all 27 backend endpoints |
 | `src/components/*` | Reusable UI components (Header, Footer, ProductModal, OrderPopup, PolicyModal, InlineSearch, ProductCard, Features, Newsletter, BackToTop) |
 | `src/context/StoreContext.tsx` | React Context for global state (cart/orders, authentication, wishlist, modals, cached products) |
@@ -42,7 +42,7 @@ npm run dev
 
 # 3. Open in browser
 # Storefront: http://localhost:3000
-# Admin Dashboard: http://localhost:3000/admin
+# Admin Dashboard: http://localhost:3000/tumanza-control-7x9p
 ```
 
 ## Production Build

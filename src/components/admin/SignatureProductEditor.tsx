@@ -5,14 +5,6 @@ import '@/app/admin.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Mail,
-  Users,
-  Star,
-  BarChart3,
-  LogOut,
   Store,
   Award,
   Plus,
@@ -57,10 +49,12 @@ interface SignatureConfig {
   returnText: string;
 }
 
-export default function AdminSignatureProductPage() {
-  const [adminToken, setAdminToken] = useState<string | null>(null);
+interface SignatureProductEditorProps {
+  adminToken: string;
+}
+
+export default function SignatureProductEditor({ adminToken }: SignatureProductEditorProps) {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -106,17 +100,8 @@ export default function AdminSignatureProductPage() {
   const [newHighlightSub, setNewHighlightSub] = useState('');
 
   useEffect(() => {
-    const saved = localStorage.getItem('peaknuts_admin_token');
-    if (saved) {
-      setAdminToken(saved);
-    }
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    if (adminToken) {
-      fetchData();
-    }
-  }, [adminToken]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -252,91 +237,9 @@ export default function AdminSignatureProductPage() {
     }
   };
 
-  if (!adminToken) {
-    return (
-      <div className="min-h-screen bg-brand-charcoal flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
-          <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Admin Authentication Required</h1>
-          <p className="text-xs text-gray-500 mt-2 mb-6">Please sign in from the main admin dashboard.</p>
-          <Link href="/admin" className="px-6 py-3 bg-brand-charcoal text-white text-xs font-bold rounded-xl uppercase tracking-wider">
-            Go to Admin Sign In
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#f4f5f7] flex flex-col md:flex-row">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-brand-charcoal text-gray-300 flex flex-col flex-shrink-0">
-        <div className="p-6 border-b border-white/15 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-serif font-bold text-white tracking-wider">Tumanza</h2>
-            <span className="text-[10px] tracking-widest font-semibold uppercase text-accent bg-accent/15 px-2 py-0.5 rounded">
-              Admin Portal
-            </span>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-          {[
-            { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, href: '/admin' },
-            { id: 'products', name: 'Products', icon: Package, href: '/admin' },
-            { id: 'signature', name: 'Signature Product', icon: Award, href: '/admin/signature-product', active: true },
-            { id: 'orders', name: 'Orders', icon: ShoppingCart, href: '/admin' },
-            { id: 'subscribers', name: 'Subscribers', icon: Mail, href: '/admin' },
-            { id: 'users', name: 'Users', icon: Users, href: '/admin' },
-            { id: 'reviews', name: 'Reviews', icon: Star, href: '/admin' },
-            { id: 'analytics', name: 'Analytics', icon: BarChart3, href: '/admin' },
-          ].map((item) => {
-            const Icon = item.icon;
-            const isActive = item.active;
-            return (
-              <Link
-                key={item.id}
-                href={item.href}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors ${
-                  isActive
-                    ? 'bg-accent text-white font-semibold shadow'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <Icon className="w-4 h-4" />
-                  <span>{item.name}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-white/10 space-y-2">
-          <Link
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full flex items-center space-x-2 text-xs text-gray-400 hover:text-white px-3 py-2 rounded-lg hover:bg-white/5"
-          >
-            <Store className="w-4 h-4" />
-            <span>Storefront</span>
-          </Link>
-          <button
-            onClick={() => {
-              localStorage.removeItem('peaknuts_admin_token');
-              window.location.href = '/admin';
-            }}
-            className="w-full flex items-center space-x-2 text-xs text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-white/5"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-6 sm:p-10 overflow-y-auto">
-        <div className="max-w-5xl mx-auto space-y-8">
+    <>
+      <div className="space-y-8">
           
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -510,7 +413,6 @@ export default function AdminSignatureProductPage() {
           )}
 
         </div>
-      </main>
 
       {/* Edit Modal */}
       {activeModal === 'edit' && (
@@ -894,6 +796,6 @@ export default function AdminSignatureProductPage() {
         </div>
       )}
 
-    </div>
+    </>
   );
 }
