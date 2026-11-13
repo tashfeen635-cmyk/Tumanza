@@ -25,6 +25,7 @@ import {
   Upload,
   Loader2,
   Tag,
+  Award,
 } from 'lucide-react';
 import { ProductItem, OrderRecord, SubscriberRecord } from '@/lib/types';
 
@@ -421,12 +422,12 @@ export default function AdminPage() {
     /* ================= LOGIN SCREEN ================= */
     return (
       <div className="min-h-screen bg-brand-charcoal flex items-center justify-center p-4" suppressHydrationWarning>
-        <div className="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl border border-white/10 text-center">
+        <div className="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl border border-white/10 text-center" suppressHydrationWarning>
           <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Tumanza Admin</h1>
           <p className="text-xs text-gray-500 mt-1 mb-6">Enter your management credentials</p>
 
           <form onSubmit={handleAdminLogin} className="space-y-4 text-left">
-            <div>
+            <div suppressHydrationWarning>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Username</label>
               <input
                 type="text"
@@ -438,7 +439,7 @@ export default function AdminPage() {
               />
             </div>
 
-            <div>
+            <div suppressHydrationWarning>
               <label className="block text-xs font-semibold text-gray-700 mb-1">Password</label>
               <input
                 type="password"
@@ -504,6 +505,7 @@ export default function AdminPage() {
           {[
             { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
             { id: 'products', name: 'Products', icon: Package, count: products.length },
+            { id: 'signature', name: 'Signature Product', icon: Award, href: '/admin/signature-product' },
             { id: 'orders', name: 'Orders', icon: ShoppingCart, count: orders.length },
             { id: 'subscribers', name: 'Subscribers', icon: Mail, count: subscribers.length },
             { id: 'users', name: 'Users', icon: Users, count: usersList.length },
@@ -514,6 +516,20 @@ export default function AdminPage() {
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
+            if (item.href) {
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <Icon className="w-4 h-4" />
+                    <span>{item.name}</span>
+                  </div>
+                </Link>
+              );
+            }
             return (
               <button
                 key={item.id}

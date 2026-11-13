@@ -8,6 +8,7 @@ export * from './Subscriber';
 export * from './Revenue';
 export * from './Tokens';
 export * from './Counter';
+export * from './SignatureProduct';
 
 // Initial Seed Data
 export * from './seedData';

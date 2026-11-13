@@ -12,6 +12,7 @@ export { default as SearchOverlay } from './modals/SearchOverlay';
 // Product Components
 export { default as ProductCard } from './products/ProductCard';
 export { default as InlineSearch } from './products/InlineSearch';
+export { default as SignatureProductSection } from './products/SignatureProductSection';
 
 // Common Components
 export { default as Features } from './common/Features';

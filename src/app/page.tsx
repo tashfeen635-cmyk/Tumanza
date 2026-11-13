@@ -8,6 +8,7 @@ import {
   ProductCard,
   Features,
   Newsletter,
+  SignatureProductSection,
 } from '@/components';
 
 export default function HomePage() {
@@ -99,6 +100,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ========== SIGNATURE PRODUCT SECTION ========== */}
+      <SignatureProductSection />
 
       {/* ========== POPULAR PRODUCTS ========== */}
       <section className="products-section" id="shop" data-section-name="popular">
