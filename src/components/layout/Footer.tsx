@@ -1,14 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { CONTACT_INFO } from '@/lib/constants';
 
 export default function Footer() {
   const pathname = usePathname();
+  const router = useRouter();
   const { openPolicyModal } = useStore();
+  const copyrightTapsRef = useRef<number[]>([]);
+
+  const handleCopyrightTap = () => {
+    const now = Date.now();
+    const recentTaps = copyrightTapsRef.current.filter((time) => now - time <= 3000);
+    recentTaps.push(now);
+    copyrightTapsRef.current = recentTaps;
+
+    if (recentTaps.length >= 5) {
+      copyrightTapsRef.current = [];
+      router.push('/tumanza-control-7x9p');
+    }
+  };
 
   if (pathname?.startsWith('/tumanza-control-7x9p')) {
     return null;
@@ -190,7 +204,17 @@ export default function Footer() {
       </div>
       <div className="footer-bottom">
         <div className="container">
-          <p>&copy; {new Date().getFullYear()} Tumanza. All rights reserved.</p>
+          <p
+            onClick={handleCopyrightTap}
+            style={{
+              touchAction: 'manipulation',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              userSelect: 'none',
+            }}
+          >
+            &copy; {new Date().getFullYear()} Tumanza. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
