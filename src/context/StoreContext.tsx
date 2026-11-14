@@ -1,12 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ProductItem, UserProfile } from '@/lib/types';
+import { ProductItem } from '@/lib/types';
 
 interface StoreContextType {
-  user: UserProfile | null;
-  token: string | null;
-  wishlist: string[];
   allProducts: ProductItem[];
   quickSearchTags: string[];
   collectionCategories: string[];
@@ -21,19 +18,12 @@ interface StoreContextType {
   closeOrderPopup: () => void;
   openPolicyModal: (policy: string) => void;
   closePolicyModal: () => void;
-  toggleWishlist: (productId: string) => Promise<void>;
-  isInWishlist: (productId: string) => boolean;
-  setUserAuth: (token: string, profile: UserProfile) => void;
-  logout: () => Promise<void>;
   refreshProducts: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider = ({ children, initialProducts = [] }: { children: ReactNode; initialProducts?: ProductItem[] }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [wishlist, setWishlist] = useState<string[]>([]);
   const [allProducts, setAllProducts] = useState<ProductItem[]>(initialProducts);
   const [quickSearchTags, setQuickSearchTags] = useState<string[]>(() => {
     try {
@@ -54,40 +44,8 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
   const [activePolicy, setActivePolicy] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Initialize Auth & Wishlist & Tags from localStorage / API
+  // Initialize Tags from localStorage / API
   useEffect(() => {
-    try {
-      const savedToken = localStorage.getItem('peaknuts_user_token');
-      const savedProfile = localStorage.getItem('peaknuts_user_profile');
-      if (savedToken) {
-        setToken(savedToken);
-        if (savedProfile) {
-          setUser(JSON.parse(savedProfile));
-        }
-        // Fetch fresh profile and wishlist
-        fetch('/api/user/profile', {
-          headers: { Authorization: `Bearer ${savedToken}` },
-        })
-          .then((res) => (res.ok ? res.json() : null))
-          .then((prof) => {
-            if (prof) {
-              setUser(prof);
-              localStorage.setItem('peaknuts_user_profile', JSON.stringify(prof));
-            }
-          })
-          .catch(() => {});
-
-        fetch('/api/user/wishlist', {
-          headers: { Authorization: `Bearer ${savedToken}` },
-        })
-          .then((res) => (res.ok ? res.json() : []))
-          .then((items) => {
-            setWishlist(items.map((i: any) => i.productId?.toString() || i.productId));
-          })
-          .catch(() => {});
-      }
-    } catch {}
-
     refreshProducts();
 
     fetch('/api/tags')
@@ -122,76 +80,6 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
       console.error('Failed to load products:', e);
     }
   };
-
-  const setUserAuth = (newToken: string, profile: UserProfile) => {
-    setToken(newToken);
-    setUser(profile);
-    localStorage.setItem('peaknuts_user_token', newToken);
-    localStorage.setItem('peaknuts_user_profile', JSON.stringify(profile));
-    // Fetch wishlist
-    fetch('/api/user/wishlist', {
-      headers: { Authorization: `Bearer ${newToken}` },
-    })
-      .then((res) => (res.ok ? res.json() : []))
-      .then((items) => {
-        setWishlist(items.map((i: any) => i.productId?.toString() || i.productId));
-      })
-      .catch(() => {});
-  };
-
-  const logout = async () => {
-    if (token) {
-      try {
-        await fetch('/api/user/logout', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } catch {}
-    }
-    setToken(null);
-    setUser(null);
-    setWishlist([]);
-    localStorage.removeItem('peaknuts_user_token');
-    localStorage.removeItem('peaknuts_user_profile');
-  };
-
-  const toggleWishlist = async (productId: string) => {
-    if (!token) {
-      window.location.href = '/account';
-      return;
-    }
-
-    const inList = wishlist.includes(productId);
-    if (inList) {
-      // Remove
-      setWishlist((prev) => prev.filter((id) => id !== productId));
-      try {
-        await fetch(`/api/user/wishlist/${productId}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      } catch {
-        setWishlist((prev) => [...prev, productId]);
-      }
-    } else {
-      // Add
-      setWishlist((prev) => [...prev, productId]);
-      try {
-        await fetch('/api/user/wishlist', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ productId }),
-        });
-      } catch {
-        setWishlist((prev) => prev.filter((id) => id !== productId));
-      }
-    }
-  };
-
-  const isInWishlist = (productId: string) => wishlist.includes(productId);
 
   const openProductModal = (product: ProductItem) => {
     setSelectedProduct(product);
@@ -230,9 +118,6 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
   return (
     <StoreContext.Provider
       value={{
-        user,
-        token,
-        wishlist,
         allProducts,
         quickSearchTags,
         collectionCategories,
@@ -247,10 +132,6 @@ export const StoreProvider = ({ children, initialProducts = [] }: { children: Re
         closeOrderPopup,
         openPolicyModal,
         closePolicyModal,
-        toggleWishlist,
-        isInWishlist,
-        setUserAuth,
-        logout,
         refreshProducts,
       }}
     >

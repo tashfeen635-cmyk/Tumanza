@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import { ProductItem, ReviewRecord } from '@/lib/types';
@@ -12,8 +11,7 @@ interface Props {
 }
 
 export default function ProductDetailClient({ product }: Props) {
-  const { openOrderPopup, toggleWishlist, isInWishlist, token } = useStore();
-  const inWishlist = isInWishlist(product._id);
+  const { openOrderPopup } = useStore();
 
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -22,10 +20,6 @@ export default function ProductDetailClient({ product }: Props) {
   const [reviews, setReviews] = useState<ReviewRecord[]>([]);
   const [avgRating, setAvgRating] = useState<number | null>(product.reviewAvg ?? null);
   const [reviewsCount, setReviewsCount] = useState(product.reviewCount || 0);
-  const [userRating, setUserRating] = useState(5);
-  const [userComment, setUserComment] = useState('');
-  const [submittingReview, setSubmittingReview] = useState(false);
-  const [reviewMessage, setReviewMessage] = useState<{ text: string; error?: boolean } | null>(null);
 
   // Gallery images (de-duplicated main + gallery images)
   const mainImg = resolveProductImage(product);
@@ -40,60 +34,15 @@ export default function ProductDetailClient({ product }: Props) {
     '★'.repeat(Math.max(1, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
 
   useEffect(() => {
-    const headers: Record<string, string> = {};
-    if (token) headers.Authorization = `Bearer ${token}`;
-    fetch(`/api/reviews/${product._id}`, { headers })
+    fetch(`/api/reviews/${product._id}`)
       .then((res) => (res.ok ? res.json() : { reviews: [] }))
       .then((data) => {
         setReviews(data.reviews || []);
         if (data.avgRating != null) setAvgRating(data.avgRating);
         setReviewsCount(data.count || 0);
-        if (data.userReview) {
-          setUserRating(data.userReview.rating || 5);
-          setUserComment(data.userReview.comment || '');
-        }
       })
       .catch(() => {});
-  }, [product._id, token]);
-
-  const handleReviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!token) {
-      window.location.href = '/account';
-      return;
-    }
-    setSubmittingReview(true);
-    setReviewMessage(null);
-    try {
-      const res = await fetch(`/api/reviews/${product._id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ rating: userRating, comment: userComment }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setReviewMessage({ text: data.message || 'Review submitted successfully!' });
-        const refRes = await fetch(`/api/reviews/${product._id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (refRes.ok) {
-          const refData = await refRes.json();
-          setReviews(refData.reviews || []);
-          setAvgRating(refData.avgRating);
-          setReviewsCount(refData.count || 0);
-        }
-      } else {
-        setReviewMessage({ text: data.error || 'Failed to submit review', error: true });
-      }
-    } catch {
-      setReviewMessage({ text: 'Network error. Please try again.', error: true });
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
+  }, [product._id]);
 
   const descriptionText =
     product.description?.trim() ||
@@ -252,25 +201,6 @@ export default function ProductDetailClient({ product }: Props) {
                   </svg>
                   ORDER NOW
                 </button>
-
-                <button
-                  type="button"
-                  onClick={() => toggleWishlist(product._id)}
-                  className={`p-4 rounded-xl border border-[#eadaad] flex items-center justify-center transition-all ${
-                    inWishlist ? 'bg-[#541d2b] text-[#dfceae]' : 'bg-white text-gray-700 hover:bg-[#fbf7f1]'
-                  }`}
-                  title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill={inWishlist ? 'currentColor' : 'none'}
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
-                </button>
               </div>
             </div>
 
@@ -337,56 +267,9 @@ export default function ProductDetailClient({ product }: Props) {
 
             {activeTab === 'reviews' && (
               <div className="space-y-8">
-                {token ? (
-                  <form onSubmit={handleReviewSubmit} className="bg-[#fbf7f1] p-6 rounded-2xl border border-[#eadaad]/60">
-                    <h3 className="text-lg font-heading font-bold text-[#1a1a1a] mb-2">Leave Your Review</h3>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-sm font-semibold text-gray-700">Rating:</span>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((s) => (
-                          <button
-                            type="button"
-                            key={s}
-                            onClick={() => setUserRating(s)}
-                            className={`text-2xl ${s <= userRating ? 'text-amber-500' : 'text-gray-300'}`}
-                          >
-                            ★
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <textarea
-                      rows={4}
-                      value={userComment}
-                      onChange={(e) => setUserComment(e.target.value)}
-                      placeholder="Write your experience with this product..."
-                      className="w-full p-4 rounded-xl border border-gray-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#541d2b]/20 mb-4"
-                    />
-                    {reviewMessage && (
-                      <p className={`text-xs mb-3 font-semibold ${reviewMessage.error ? 'text-red-600' : 'text-[#541d2b]'}`}>
-                        {reviewMessage.text}
-                      </p>
-                    )}
-                    <button
-                      type="submit"
-                      disabled={submittingReview}
-                      className="bg-[#541d2b] hover:bg-[#3f1520] text-[#dfceae] font-bold px-6 py-2.5 rounded-xl text-xs tracking-wider uppercase transition-all shadow"
-                    >
-                      {submittingReview ? 'Submitting...' : 'Submit Review'}
-                    </button>
-                  </form>
-                ) : (
-                  <div className="p-4 bg-gray-50 rounded-xl text-sm text-gray-600 flex items-center justify-between">
-                    <span>Want to share your review? Sign in to your account.</span>
-                    <Link href="/account" className="font-bold text-[#541d2b] hover:underline">
-                      Sign In &rarr;
-                    </Link>
-                  </div>
-                )}
-
                 <div className="space-y-4">
                   {reviews.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No reviews yet for this product. Be the first to review!</p>
+                    <p className="text-gray-500 text-sm">No reviews yet for this product.</p>
                   ) : (
                     reviews.map((r) => {
                       const rStars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));

@@ -4,14 +4,14 @@ import React, { useState } from 'react';
 import { useStore } from '@/context/StoreContext';
 
 export default function OrderPopup() {
-  const { orderProduct, closeOrderPopup, user, token } = useStore();
+  const { orderProduct, closeOrderPopup } = useStore();
 
-  const [firstName, setFirstName] = useState(user?.name ? user.name.split(' ')[0] : '');
-  const [lastName, setLastName] = useState(user?.name ? user.name.split(' ').slice(1).join(' ') : '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [phone, setPhone] = useState(user?.phone || '');
-  const [city, setCity] = useState(user?.city || '');
-  const [address, setAddress] = useState(user?.address || '');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [address, setAddress] = useState('');
   const [postcode, setPostcode] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -54,13 +54,10 @@ export default function OrderPopup() {
       ],
     };
 
-    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
       });
 

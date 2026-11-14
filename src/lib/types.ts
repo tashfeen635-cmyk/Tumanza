@@ -42,15 +42,6 @@ export interface OrderRecord {
   items: OrderItem[];
 }
 
-export interface UserProfile {
-  name: string;
-  email: string;
-  phone: string;
-  city: string;
-  address: string;
-  verified: boolean;
-}
-
 export interface ReviewRecord {
   _id: string;
   rating: number;

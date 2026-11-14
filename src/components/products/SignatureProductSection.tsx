@@ -27,7 +27,7 @@ interface SignatureConfig {
 }
 
 export default function SignatureProductSection() {
-  const { allProducts, openOrderPopup, toggleWishlist, isInWishlist } = useStore();
+  const { allProducts, openOrderPopup } = useStore();
   
   // ALL HOOKS MUST BE CALLED UNCONDITIONALLY AT THE TOP
   const [config, setConfig] = useState<SignatureConfig | null>(null);
@@ -56,8 +56,6 @@ export default function SignatureProductSection() {
   if (config && (!config.enabled || !config.published)) {
     return null;
   }
-
-  const inWishlist = isInWishlist(product._id);
 
   const mainImg = resolveProductImage(product);
   const rawImages = [
@@ -133,20 +131,6 @@ export default function SignatureProductSection() {
                     {badge}
                   </span>
                 )}
-
-                {/* Wishlist Button */}
-                <button
-                  type="button"
-                  onClick={() => toggleWishlist(product._id)}
-                  className={`absolute top-4 right-4 z-10 p-3 rounded-full border border-[#eadaad] transition-all shadow-sm ${
-                    inWishlist ? 'bg-[#541d2b] text-[#dfceae]' : 'bg-white text-gray-700 hover:bg-[#FFF8ED]'
-                  }`}
-                  title={inWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                >
-                  <svg className="w-5 h-5" fill={inWishlist ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                  </svg>
-                </button>
 
                 {/* Previous / Next Navigation Arrows */}
                 {galleryImages.length > 1 && (

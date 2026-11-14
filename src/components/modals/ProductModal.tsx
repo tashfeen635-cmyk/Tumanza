@@ -1,90 +1,34 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
 import { ReviewRecord } from '@/lib/types';
 
 export default function ProductModal() {
-  const { selectedProduct, closeProductModal, openOrderPopup, token } = useStore();
+  const { selectedProduct, closeProductModal, openOrderPopup } = useStore();
   const [reviews, setReviews] = useState<ReviewRecord[]>([]);
   const [avgRating, setAvgRating] = useState<number | null>(null);
   const [reviewsCount, setReviewsCount] = useState<number>(0);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
-  // Review submission state
-  const [userRating, setUserRating] = useState<number>(5);
-  const [userComment, setUserComment] = useState<string>('');
-  const [submittingReview, setSubmittingReview] = useState(false);
-  const [reviewMessage, setReviewMessage] = useState<{ text: string; error?: boolean } | null>(null);
-
   useEffect(() => {
     if (!selectedProduct) return;
 
     setLoadingReviews(true);
-    setReviewMessage(null);
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    fetch(`/api/reviews/${selectedProduct._id}`, { headers })
+    fetch(`/api/reviews/${selectedProduct._id}`)
       .then((res) => (res.ok ? res.json() : { reviews: [] }))
       .then((data) => {
         setReviews(data.reviews || []);
         setAvgRating(data.avgRating);
         setReviewsCount(data.count || 0);
-        if (data.userReview) {
-          setUserRating(data.userReview.rating || 5);
-          setUserComment(data.userReview.comment || '');
-        } else {
-          setUserRating(5);
-          setUserComment('');
-        }
       })
       .catch((e) => console.error('Failed to load reviews:', e))
       .finally(() => setLoadingReviews(false));
-  }, [selectedProduct, token]);
+  }, [selectedProduct]);
 
   if (!selectedProduct) return null;
-
-  const handleReviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!token) return;
-
-    setSubmittingReview(true);
-    setReviewMessage(null);
-
-    try {
-      const res = await fetch(`/api/reviews/${selectedProduct._id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ rating: userRating, comment: userComment }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setReviewMessage({ text: data.message || 'Review submitted successfully!' });
-        const refRes = await fetch(`/api/reviews/${selectedProduct._id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (refRes.ok) {
-          const refData = await refRes.json();
-          setReviews(refData.reviews || []);
-          setAvgRating(refData.avgRating);
-          setReviewsCount(refData.count || 0);
-        }
-      } else {
-        setReviewMessage({ text: data.error || 'Failed to submit review', error: true });
-      }
-    } catch {
-      setReviewMessage({ text: 'Network error. Please try again.', error: true });
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
 
   const getBenefits = () => {
     const name = selectedProduct.name.toLowerCase();
@@ -262,73 +206,10 @@ export default function ProductModal() {
                 )}
               </div>
 
-              {token ? (
-                <form
-                  onSubmit={handleReviewSubmit}
-                  style={{ background: 'var(--off-white)', padding: '16px', marginBottom: '20px', borderRadius: '4px' }}
-                >
-                  <p style={{ margin: '0 0 8px', fontSize: '13px', fontWeight: 600, color: 'var(--black)' }}>
-                    Share Your Feedback
-                  </p>
-                  <div style={{ display: 'flex', gap: '4px', marginBottom: '10px' }}>
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <span
-                        key={s}
-                        onClick={() => setUserRating(s)}
-                        style={{
-                          cursor: 'pointer',
-                          fontSize: '22px',
-                          color: s <= userRating ? 'var(--accent)' : '#ccc',
-                        }}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <textarea
-                    rows={3}
-                    value={userComment}
-                    onChange={(e) => setUserComment(e.target.value)}
-                    placeholder="Write your honest review..."
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      fontSize: '13px',
-                      fontFamily: 'inherit',
-                      boxSizing: 'border-box',
-                    }}
-                  />
-                  {reviewMessage && (
-                    <p style={{ fontSize: '12px', marginTop: '6px', color: reviewMessage.error ? '#d32f2f' : 'var(--primary)' }}>
-                      {reviewMessage.text}
-                    </p>
-                  )}
-                  <div style={{ marginTop: '8px', textAlign: 'right' }}>
-                    <button
-                      type="submit"
-                      disabled={submittingReview}
-                      className="btn btn-primary"
-                      style={{ padding: '8px 20px', fontSize: '11px' }}
-                    >
-                      {submittingReview ? 'Submitting...' : 'Submit Review'}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div style={{ padding: '12px', background: '#f5f5f5', fontSize: '12px', marginBottom: '16px' }}>
-                  <span>Want to review this product? </span>
-                  <Link href="/account" onClick={closeProductModal} style={{ color: 'var(--accent)', fontWeight: 600 }}>
-                    Sign in to leave a review
-                  </Link>
-                </div>
-              )}
-
               {loadingReviews ? (
                 <p style={{ fontSize: '13px', color: '#999', textAlign: 'center' }}>Loading reviews...</p>
               ) : reviews.length === 0 ? (
-                <p style={{ fontSize: '13px', color: '#999', textAlign: 'center' }}>No reviews yet. Be the first!</p>
+                <p style={{ fontSize: '13px', color: '#999', textAlign: 'center' }}>No reviews yet.</p>
               ) : (
                 <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
                   {reviews.map((r) => (

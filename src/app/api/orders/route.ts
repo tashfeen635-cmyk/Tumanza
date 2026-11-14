@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
-import { Order, Product, SignatureProduct, UserToken, nextOrderNumber } from '@/models';
+import { Order, Product, SignatureProduct, nextOrderNumber } from '@/models';
 import { requireAdmin, cleanStr, isValidEmail } from '@/lib/auth';
 import { sendOrderConfirmationEmail } from '@/lib/email';
 import { sendAdminPush } from '@/lib/push';
@@ -127,19 +127,8 @@ export async function POST(request: Request) {
     const date = new Date().toISOString().slice(0, 10);
     const status = 'Pending';
 
-    // Associate with authenticated user if token passed
-    let userId: any = null;
-    const authHeader = request.headers.get('authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      try {
-        const foundToken = await UserToken.findOne({ token: authHeader.slice(7) });
-        if (foundToken) userId = foundToken.userId;
-      } catch {}
-    }
-
     const order = await Order.create({
       orderId,
-      userId,
       customer,
       email,
       phone,

@@ -84,12 +84,6 @@ export default function Header() {
                 </svg>
               </Link>
 
-              <Link href="/account" className="header-icon" aria-label="Account">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-              </Link>
             </div>
 
             <button
@@ -126,11 +120,6 @@ export default function Header() {
             <li>
               <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
                 CONTACT
-              </Link>
-            </li>
-            <li>
-              <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
-                MY ACCOUNT
               </Link>
             </li>
           </ul>

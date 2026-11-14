@@ -1,8 +1,15 @@
 import nodemailer from 'nodemailer';
 import { escapeHtml } from './auth';
 
+const smtpPort = Number(process.env.EMAIL_PORT) || 465;
+
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: process.env.EMAIL_HOST || 'smtp.hostinger.com',
+  port: smtpPort,
+  secure:
+    process.env.EMAIL_SECURE !== undefined
+      ? process.env.EMAIL_SECURE === 'true'
+      : smtpPort === 465,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -96,69 +103,6 @@ export async function sendOrderConfirmationEmail(toEmail: string, order: any) {
     await transporter.sendMail(mailOptions);
   } catch (err: any) {
     console.error('Order confirmation email error:', err.message);
-  }
-}
-
-export async function sendPasswordResetEmail(toEmail: string, code: string) {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log('[Email] Skipped sending reset code (credentials not configured):', code);
-    return;
-  }
-
-  const mailOptions = {
-    from: `"Tumanza" <${process.env.EMAIL_USER}>`,
-    to: toEmail,
-    subject: 'Your Password Reset Code - Tumanza',
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:30px;background:#f9f8f5;border-radius:8px">
-      <h1 style="font-family:Georgia,serif;color:#1a1a1a;font-size:28px;margin-bottom:10px">Reset Your Password</h1>
-      <p style="color:#5d5b5b;font-size:15px;line-height:1.8">We received a request to reset your password. Use the code below to proceed:</p>
-      <div style="text-align:center;margin:30px 0;padding:24px;background:#fff;border-radius:8px;border:2px dashed #ddd">
-        <p style="color:#999;font-size:13px;margin:0 0 8px;letter-spacing:1px">YOUR RESET CODE</p>
-        <div style="font-family:monospace;font-size:40px;font-weight:700;letter-spacing:10px;color:#1a1a1a">${code}</div>
-      </div>
-      <p style="color:#5d5b5b;font-size:13px;line-height:1.8">This code will expire in <strong>10 minutes</strong>. If you didn't request this, please ignore this email.</p>
-      <p style="color:#8B9A46;font-weight:600;font-size:16px;margin-top:20px">&mdash; The Tumanza Team</p>
-      <hr style="border:none;border-top:1px solid #e0e0e0;margin:25px 0">
-      <p style="color:#999;font-size:12px;text-align:center">Tumanza &mdash; Premium Organic Nuts &amp; Superfoods</p>
-    </div>`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (err: any) {
-    console.error('Password reset email error:', err.message);
-  }
-}
-
-export async function sendVerificationEmail(toEmail: string, verifyToken: string) {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log('[Email] Skipped sending verification email (credentials not configured)');
-    return;
-  }
-
-  const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
-  const verifyLink = `${siteUrl}/account?verify=${verifyToken}`;
-  const mailOptions = {
-    from: `"Tumanza" <${process.env.EMAIL_USER}>`,
-    to: toEmail,
-    subject: 'Verify Your Email - Tumanza',
-    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:30px;background:#f9f8f5;border-radius:8px">
-      <h1 style="font-family:Georgia,serif;color:#1a1a1a;font-size:28px;margin-bottom:10px">Verify Your Email</h1>
-      <p style="color:#5d5b5b;font-size:15px;line-height:1.8">Welcome to Tumanza! Please verify your email address to activate your account:</p>
-      <div style="text-align:center;margin:30px 0">
-        <a href="${verifyLink}" style="background:#8B9A46;color:#fff;padding:14px 32px;text-decoration:none;border-radius:4px;font-size:14px;font-weight:600;letter-spacing:1px">VERIFY EMAIL</a>
-      </div>
-      <p style="color:#5d5b5b;font-size:13px;line-height:1.8">This link will expire in 24 hours.</p>
-      <p style="color:#8B9A46;font-weight:600;font-size:16px;margin-top:20px">&mdash; The Tumanza Team</p>
-      <hr style="border:none;border-top:1px solid #e0e0e0;margin:25px 0">
-      <p style="color:#999;font-size:12px;text-align:center">Tumanza &mdash; Premium Organic Nuts &amp; Superfoods</p>
-    </div>`,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (err: any) {
-    console.error('Verification email error:', err.message);
   }
 }
 

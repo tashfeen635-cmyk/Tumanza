@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { connectDB } from './db';
-import { Token, UserToken, User, IUser, Setting } from '@/models';
+import { Token, Setting } from '@/models';
 
 export function escapeHtml(value: unknown): string {
   return String(value == null ? '' : value)
@@ -161,15 +161,3 @@ export async function requireAdmin(request: Request): Promise<boolean> {
   return safeEqual(tokenStr, masterSecret);
 }
 
-export async function requireUser(request: Request): Promise<IUser | null> {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null;
-  }
-  const tokenStr = authHeader.slice(7);
-  await connectDB();
-  const found = await UserToken.findOne({ token: tokenStr });
-  if (!found) return null;
-  const user = await User.findById(found.userId);
-  return user || null;
-}

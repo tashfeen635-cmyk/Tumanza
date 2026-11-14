@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
-import { Review, User, UserToken, Product } from '@/models';
-import { requireUser, cleanStr } from '@/lib/auth';
-import { sendAdminPush } from '@/lib/push';
+import { Review, User } from '@/models';
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
@@ -16,14 +14,6 @@ export async function GET(
     }
 
     await connectDB();
-
-    // Check if requesting user has token to return userReview
-    let currentUserId: string | null = null;
-    const authHeader = request.headers.get('authorization');
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const found = await UserToken.findOne({ token: authHeader.slice(7) });
-      if (found) currentUserId = found.userId.toString();
-    }
 
     const reviews = await Review.find({ productId: new mongoose.Types.ObjectId(productId) })
       .sort({ createdAt: -1 })
@@ -38,7 +28,6 @@ export async function GET(
 
     const result = [];
     let totalRating = 0;
-    let userReview = null;
 
     for (let i = 0; i < reviews.length; i++) {
       totalRating += reviews[i].rating;
@@ -49,9 +38,6 @@ export async function GET(
         createdAt: reviews[i].createdAt,
         userName: userMap[reviews[i].userId.toString()] || 'Unknown',
       });
-      if (currentUserId && reviews[i].userId.toString() === currentUserId) {
-        userReview = { rating: reviews[i].rating, comment: reviews[i].comment };
-      }
     }
 
     const avgRating = reviews.length > 0 ? Math.round((totalRating / reviews.length) * 10) / 10 : null;
@@ -60,79 +46,9 @@ export async function GET(
       reviews: result,
       avgRating,
       count: reviews.length,
-      userReview,
     });
   } catch (err: any) {
     console.error('Get reviews error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
-
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ productId: string }> }
-) {
-  try {
-    const user = await requireUser(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    const { productId } = await params;
-    if (!mongoose.isValidObjectId(productId)) {
-      return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
-    }
-
-    const body = await request.json();
-    const rating = parseInt(body.rating, 10);
-    const comment = cleanStr(body.comment, 1000);
-
-    if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 });
-    }
-
-    await connectDB();
-    const existing = await Review.findOne({
-      userId: user._id,
-      productId: new mongoose.Types.ObjectId(productId),
-    });
-
-    if (existing) {
-      existing.rating = rating;
-      existing.comment = comment;
-      existing.createdAt = new Date();
-      await existing.save();
-      return NextResponse.json({ message: 'Review updated' });
-    } else {
-      const review = await Review.create({
-        productId: new mongoose.Types.ObjectId(productId),
-        userId: user._id,
-        rating,
-        comment,
-      });
-
-      let productName = 'a product';
-      try {
-        const product = await Product.findById(productId).select('name').lean();
-        if (product && product.name) productName = product.name;
-      } catch {}
-
-      const preview = comment
-        ? `: ${comment.length > 80 ? comment.slice(0, 80) + '…' : comment}`
-        : '';
-
-      void sendAdminPush({
-        type: 'review',
-        title: 'New customer review',
-        body: `${user.name} rated ${productName} ${rating}★${preview}`,
-        tag: `review:${review._id}`,
-        url: '/tumanza-control-7x9p?section=reviews',
-      });
-
-      return NextResponse.json({ message: 'Review added' }, { status: 201 });
-    }
-  } catch (err: any) {
-    console.error('Submit review error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

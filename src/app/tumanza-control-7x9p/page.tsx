@@ -9,7 +9,6 @@ import {
   Package,
   ShoppingCart,
   Mail,
-  Users,
   Star,
   BarChart3,
   LogOut,
@@ -49,7 +48,7 @@ export default function AdminPage() {
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState<
-    'dashboard' | 'products' | 'signature' | 'instagram' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics' | 'tags' | 'categories' | 'settings'
+    'dashboard' | 'products' | 'signature' | 'instagram' | 'orders' | 'subscribers' | 'reviews' | 'analytics' | 'tags' | 'categories' | 'settings'
   >('dashboard');
 
   // Account settings
@@ -67,7 +66,6 @@ export default function AdminPage() {
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [subscribers, setSubscribers] = useState<SubscriberRecord[]>([]);
-  const [usersList, setUsersList] = useState<any[]>([]);
   const [reviewsList, setReviewsList] = useState<any[]>([]);
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [revenueData, setRevenueData] = useState<{ labels: string[]; values: number[] }>({
@@ -133,7 +131,6 @@ export default function AdminPage() {
         'instagram',
         'orders',
         'subscribers',
-        'users',
         'reviews',
         'analytics',
         'tags',
@@ -208,12 +205,11 @@ export default function AdminPage() {
     const headers = { Authorization: `Bearer ${adminToken}` };
 
     try {
-      const [prodsRes, ordsRes, subsRes, revRes, usersRes, revsRes, anaRes, tagsRes, catsRes] = await Promise.all([
+      const [prodsRes, ordsRes, subsRes, revRes, revsRes, anaRes, tagsRes, catsRes] = await Promise.all([
         fetch('/api/products', { cache: 'no-store' }),
         fetch('/api/orders', { headers, cache: 'no-store' }),
         fetch('/api/subscribers', { headers, cache: 'no-store' }),
         fetch('/api/revenue', { headers, cache: 'no-store' }),
-        fetch('/api/admin/users', { headers, cache: 'no-store' }),
         fetch('/api/admin/reviews', { headers, cache: 'no-store' }),
         fetch('/api/admin/analytics', { headers, cache: 'no-store' }),
         fetch('/api/tags', { cache: 'no-store' }),
@@ -224,7 +220,6 @@ export default function AdminPage() {
       if (ordsRes.ok) setOrders(await ordsRes.json());
       if (subsRes.ok) setSubscribers(await subsRes.json());
       if (revRes.ok) setRevenueData(await revRes.json());
-      if (usersRes.ok) setUsersList(await usersRes.json());
       if (revsRes.ok) setReviewsList(await revsRes.json());
       if (anaRes.ok) setAnalyticsData(await anaRes.json());
       if (tagsRes.ok) {
@@ -685,7 +680,6 @@ export default function AdminPage() {
             { id: 'instagram', name: 'Instagram Feed', icon: InstagramIcon },
             { id: 'orders', name: 'Orders', icon: ShoppingCart, count: orders.length },
             { id: 'subscribers', name: 'Subscribers', icon: Mail, count: subscribers.length },
-            { id: 'users', name: 'Users', icon: Users, count: usersList.length },
             { id: 'reviews', name: 'Reviews', icon: Star, count: reviewsList.length },
             { id: 'analytics', name: 'Analytics', icon: BarChart3 },
             { id: 'tags', name: 'Quick Search Tags', icon: Tag, count: quickSearchTags.length },
@@ -1144,60 +1138,6 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          </div>
-        )}
-
-        {/* ================= SECTION: USERS ================= */}
-        {activeSection === 'users' && (
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-2xl font-serif font-bold text-brand-charcoal">Registered Customers</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                Verified member accounts and lifetime order counts
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-gray-50 text-gray-500 font-semibold border-b border-gray-100">
-                    <tr>
-                      <th className="p-3">Customer</th>
-                      <th className="p-3">Phone</th>
-                      <th className="p-3">City</th>
-                      <th className="p-3">Verified</th>
-                      <th className="p-3">Orders Placed</th>
-                      <th className="p-3">Member Since</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {usersList.map((u) => (
-                      <tr key={u._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="p-3">
-                          <span className="font-bold text-brand-charcoal block">{u.name}</span>
-                          <span className="text-gray-400 text-[11px]">{u.email}</span>
-                        </td>
-                        <td className="p-3 text-gray-600">{u.phone || '—'}</td>
-                        <td className="p-3 text-gray-600">{u.city || '—'}</td>
-                        <td className="p-3">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              u.verified
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-600'
-                            }`}
-                          >
-                            {u.verified ? 'Verified' : 'Unverified'}
-                          </span>
-                        </td>
-                        <td className="p-3 font-semibold text-brand-charcoal">{u.orderCount}</td>
-                        <td className="p-3 text-gray-400">{u.createdAt?.slice(0, 10)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         )}
