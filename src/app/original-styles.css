@@ -1253,6 +1253,7 @@ header {
   .hero-content {
     max-width: 100%;
     margin: -57px 0px;
+    margin-top: 40%;
   }
 
   .hero-text {

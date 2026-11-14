@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
@@ -9,10 +9,38 @@ import { productSlug } from '@/lib/seo';
 
 export default function SearchOverlay() {
   const router = useRouter();
-  const { searchOpen, setSearchOpen, allProducts, quickSearchTags } = useStore();
+  const { searchOpen, setSearchOpen, allProducts, quickSearchTags, openProductModal } = useStore();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ProductItem[]>([]);
+  const [signatureProduct, setSignatureProduct] = useState<ProductItem | null>(null);
+  const [signatureKeywords, setSignatureKeywords] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetch('/api/signature-product', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data?.enabled || !data?.published || !data?.product?.name) return;
+
+        const product = data.product as ProductItem;
+        setSignatureProduct({
+          ...product,
+          section: product.section || 'signature',
+          rating: product.rating ?? 5,
+        });
+
+        const highlights = Array.isArray(data.highlights) ? data.highlights : [];
+        setSignatureKeywords(
+          [
+            data.sectionHeading,
+            data.tagline,
+            ...highlights.map((h: { title?: string; subtitle?: string }) => `${h.title || ''} ${h.subtitle || ''}`),
+          ]
+            .filter(Boolean)
+            .join(' ')
+        );
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (searchOpen) {
@@ -22,7 +50,6 @@ export default function SearchOverlay() {
       document.body.style.overflow = 'hidden';
     } else {
       setQuery('');
-      setResults([]);
       document.body.style.overflow = '';
     }
   }, [searchOpen]);
@@ -37,20 +64,25 @@ export default function SearchOverlay() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [searchOpen, setSearchOpen]);
 
-  const handleSearch = (text: string) => {
-    setQuery(text);
-    const q = text.trim().toLowerCase();
-    if (!q) {
-      setResults([]);
-      return;
-    }
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
 
-    const filtered = allProducts.filter((p) => {
-      const matchable = `${p.name} ${p.category} ${p.description || ''} ${p.urduName || ''}`.toLowerCase();
+    const catalog = signatureProduct
+      ? [
+          signatureProduct,
+          ...allProducts.filter(
+            (p) => p.name.trim().toLowerCase() !== signatureProduct.name.trim().toLowerCase()
+          ),
+        ]
+      : allProducts;
+
+    return catalog.filter((p) => {
+      const extra = p._id === signatureProduct?._id ? ` ${signatureKeywords}` : '';
+      const matchable = `${p.name} ${p.category} ${p.description || ''} ${p.urduName || ''}${extra}`.toLowerCase();
       return matchable.includes(q);
     });
-    setResults(filtered);
-  };
+  }, [query, allProducts, signatureProduct, signatureKeywords]);
 
   if (!searchOpen) return null;
 
@@ -97,7 +129,7 @@ export default function SearchOverlay() {
               placeholder="Search nuts, herbs, teas, supplements..."
               className="search-input"
               value={query}
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
             />
             <button
               className="search-close"
@@ -118,7 +150,7 @@ export default function SearchOverlay() {
               <button
                 key={tag}
                 type="button"
-                onClick={() => handleSearch(tag)}
+                onClick={() => setQuery(tag)}
                 style={{
                   background: query.toLowerCase() === tag.toLowerCase() ? '#541d2b' : '#f5f0eb',
                   color: query.toLowerCase() === tag.toLowerCase() ? '#fff' : '#444',
@@ -168,6 +200,10 @@ export default function SearchOverlay() {
                   className="search-result-item"
                   onClick={() => {
                     setSearchOpen(false);
+                    if (product._id === signatureProduct?._id) {
+                      window.setTimeout(() => openProductModal(product), 0);
+                      return;
+                    }
                     router.push(`/product/${productSlug(product)}`);
                   }}
                 >

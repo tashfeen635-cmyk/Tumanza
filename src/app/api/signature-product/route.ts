@@ -57,6 +57,8 @@ export async function GET() {
       images: config.images,
       badge: config.badge,
       description: config.description,
+      section: 'signature',
+      rating: 5,
       reviewAvg: 5,
       reviewCount: 42,
     };
