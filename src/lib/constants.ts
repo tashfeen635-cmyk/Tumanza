@@ -13,6 +13,15 @@ export const PRODUCT_CATEGORIES = [
 
 export const ORDER_STATUSES = ['Pending', 'Shipped', 'Delivered'] as const;
 
+export const DEFAULT_INSTAGRAM_IMAGES = [
+  '/images/product-pack.jpg',
+  '/images/showcase.png',
+  '/img/hero.jpg',
+  '/img/hero-mobile.jpg',
+  '/images/product-pack.jpg',
+  '/images/showcase.png',
+];
+
 /**
  * NAP (Name / Address / Phone) — keep identical on footer, contact, schema & Google Business.
  */

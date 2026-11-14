@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useStore } from '@/context/StoreContext';
+import { DEFAULT_INSTAGRAM_IMAGES } from '@/lib/constants';
 import {
   ProductCard,
   Features,
@@ -14,6 +15,30 @@ import {
 export default function HomePage() {
   const { allProducts, collectionCategories } = useStore();
   const [selectedCollectionCategory, setSelectedCollectionCategory] = React.useState('All');
+  const [instagramImages, setInstagramImages] = React.useState<string[]>([
+    ...DEFAULT_INSTAGRAM_IMAGES,
+  ]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/instagram-feed', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (
+          !cancelled &&
+          Array.isArray(data?.images) &&
+          data.images.length === DEFAULT_INSTAGRAM_IMAGES.length
+        ) {
+          setInstagramImages(data.images.map(String));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const collectionCategoriesList = ['All', ...collectionCategories];
 
@@ -44,15 +69,6 @@ export default function HomePage() {
       role: 'Verified Buyer',
       text: 'Fast delivery, eco-friendly packaging, and the cashews are unbelievably fresh. Tumanza has become our household staple. Highly recommend!',
     },
-  ];
-
-  const instagramImages = [
-    '/images/product-pack.jpg',
-    '/images/showcase.png',
-    '/img/hero.jpg',
-    '/img/hero-mobile.jpg',
-    '/images/product-pack.jpg',
-    '/images/showcase.png',
   ];
 
   return (
@@ -217,6 +233,7 @@ export default function HomePage() {
                 fill
                 sizes="(max-width: 768px) 50vw, 33vw"
                 loading="lazy"
+                unoptimized={!src.startsWith('/')}
                 className="object-cover"
               />
               <div className="instagram-overlay">

@@ -30,7 +30,9 @@ import {
   KeyRound,
 } from 'lucide-react';
 import { ProductItem, OrderRecord, SubscriberRecord } from '@/lib/types';
+import { InstagramIcon } from '@/components/common/Icons';
 import SignatureProductEditor from '@/components/admin/SignatureProductEditor';
+import InstagramFeedEditor from '@/components/admin/InstagramFeedEditor';
 import AdminNotifications from '@/components/admin/AdminNotifications';
 import { unlockNotificationAudio } from '@/lib/notificationSound';
 
@@ -47,7 +49,7 @@ export default function AdminPage() {
 
   // Active navigation section
   const [activeSection, setActiveSection] = useState<
-    'dashboard' | 'products' | 'signature' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics' | 'tags' | 'categories' | 'settings'
+    'dashboard' | 'products' | 'signature' | 'instagram' | 'orders' | 'subscribers' | 'users' | 'reviews' | 'analytics' | 'tags' | 'categories' | 'settings'
   >('dashboard');
 
   // Account settings
@@ -128,6 +130,7 @@ export default function AdminPage() {
         'dashboard',
         'products',
         'signature',
+        'instagram',
         'orders',
         'subscribers',
         'users',
@@ -679,6 +682,7 @@ export default function AdminPage() {
             { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard },
             { id: 'products', name: 'Products', icon: Package, count: products.length },
             { id: 'signature', name: 'Signature Product', icon: Award },
+            { id: 'instagram', name: 'Instagram Feed', icon: InstagramIcon },
             { id: 'orders', name: 'Orders', icon: ShoppingCart, count: orders.length },
             { id: 'subscribers', name: 'Subscribers', icon: Mail, count: subscribers.length },
             { id: 'users', name: 'Users', icon: Users, count: usersList.length },
@@ -1523,6 +1527,11 @@ export default function AdminPage() {
         {/* ================= SECTION: SIGNATURE PRODUCT ================= */}
         {activeSection === 'signature' && adminToken && (
           <SignatureProductEditor adminToken={adminToken} />
+        )}
+
+        {/* ================= SECTION: INSTAGRAM FEED ================= */}
+        {activeSection === 'instagram' && adminToken && (
+          <InstagramFeedEditor adminToken={adminToken} />
         )}
 
         {/* ================= SECTION: ACCOUNT SETTINGS ================= */}
