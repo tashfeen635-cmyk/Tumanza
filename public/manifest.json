@@ -1,15 +1,23 @@
 {
+  "id": "/",
   "name": "Tumanza — Organic Nuts, Herbs & Superfoods",
   "short_name": "Tumanza",
   "description": "Shop premium organic nuts, herbs, teas & superfoods from Gilgit-Baltistan — delivered across Pakistan.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#fbf7f1",
   "theme_color": "#dfceae",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
-import { Review, User, UserToken } from '@/models';
+import { Review, User, UserToken, Product } from '@/models';
 import { requireUser, cleanStr } from '@/lib/auth';
+import { sendAdminPush } from '@/lib/push';
 
 export async function GET(
   request: Request,
@@ -103,12 +104,31 @@ export async function POST(
       await existing.save();
       return NextResponse.json({ message: 'Review updated' });
     } else {
-      await Review.create({
+      const review = await Review.create({
         productId: new mongoose.Types.ObjectId(productId),
         userId: user._id,
         rating,
         comment,
       });
+
+      let productName = 'a product';
+      try {
+        const product = await Product.findById(productId).select('name').lean();
+        if (product && product.name) productName = product.name;
+      } catch {}
+
+      const preview = comment
+        ? `: ${comment.length > 80 ? comment.slice(0, 80) + '…' : comment}`
+        : '';
+
+      void sendAdminPush({
+        type: 'review',
+        title: 'New customer review',
+        body: `${user.name} rated ${productName} ${rating}★${preview}`,
+        tag: `review:${review._id}`,
+        url: '/tumanza-control-7x9p?section=reviews',
+      });
+
       return NextResponse.json({ message: 'Review added' }, { status: 201 });
     }
   } catch (err: any) {

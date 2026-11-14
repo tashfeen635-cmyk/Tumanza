@@ -120,6 +120,29 @@ export default function AdminPage() {
     }
   }, []);
 
+  // Open the section requested by a push notification
+  useEffect(() => {
+    try {
+      const section = new URLSearchParams(window.location.search).get('section');
+      const allowed = [
+        'dashboard',
+        'products',
+        'signature',
+        'orders',
+        'subscribers',
+        'users',
+        'reviews',
+        'analytics',
+        'tags',
+        'categories',
+        'settings',
+      ];
+      if (section && allowed.includes(section)) {
+        setActiveSection(section as typeof activeSection);
+      }
+    } catch {}
+  }, []);
+
   // Restore an active login lock countdown after a refresh
   useEffect(() => {
     try {

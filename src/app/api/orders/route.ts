@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import { Order, Product, SignatureProduct, UserToken, nextOrderNumber } from '@/models';
 import { requireAdmin, cleanStr, isValidEmail } from '@/lib/auth';
 import { sendOrderConfirmationEmail } from '@/lib/email';
+import { sendAdminPush } from '@/lib/push';
 
 export async function GET(request: Request) {
   try {
@@ -151,6 +152,19 @@ export async function POST(request: Request) {
 
     // Fire-and-forget email
     sendOrderConfirmationEmail(email, order).catch(() => {});
+
+    const itemCount = sanitizedItems.reduce((sum, item) => sum + item.qty, 0);
+    const orderTotal = sanitizedItems.reduce(
+      (sum, item) => sum + item.price * item.qty,
+      0
+    );
+    void sendAdminPush({
+      type: 'order',
+      title: 'New order received',
+      body: `${customer} • ${itemCount} item${itemCount === 1 ? '' : 's'} • Rs.${orderTotal.toFixed(0)}`,
+      tag: `order:${order._id}`,
+      url: '/tumanza-control-7x9p?section=orders',
+    });
 
     return NextResponse.json(order, { status: 201 });
   } catch (err: any) {

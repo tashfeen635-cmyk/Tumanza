@@ -94,8 +94,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.png',
+    apple: '/icons/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    title: 'Tumanza',
+    statusBarStyle: 'default',
+  },
 };
 
 export default function RootLayout({

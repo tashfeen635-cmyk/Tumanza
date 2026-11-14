@@ -1,59 +1,69 @@
-var CACHE_NAME = 'tumanza-v1';
-var STATIC_ASSETS = [
-  '/',
-  '/shop',
-  '/account',
-  '/about',
-  '/contact',
-  '/styles.css',
-  '/script.js',
-  '/account.js',
-  '/favicon.png',
-  '/manifest.json'
-];
+const DEFAULT_URL = '/tumanza-control-7x9p';
+const ICON = '/icons/icon-192.png';
 
-// Install: cache static assets
-self.addEventListener('install', function (e) {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
+self.addEventListener('install', function () {
   self.skipWaiting();
 });
 
-// Activate: clean old caches
-self.addEventListener('activate', function (e) {
-  e.waitUntil(
-    caches.keys().then(function (names) {
-      return Promise.all(
-        names.filter(function (name) { return name !== CACHE_NAME; })
-          .map(function (name) { return caches.delete(name); })
-      );
-    })
-  );
-  self.clients.claim();
+self.addEventListener('activate', function (event) {
+  event.waitUntil(self.clients.claim());
 });
 
-// Fetch: network first, cache fallback
-self.addEventListener('fetch', function (e) {
-  // Skip API requests - always go to network
-  if (e.request.url.indexOf('/api/') !== -1) {
-    return;
+self.addEventListener('fetch', function () {
+  // Network only. Push notifications do not need an offline cache, and caching
+  // Next.js pages can serve stale content after a deployment.
+});
+
+self.addEventListener('push', function (event) {
+  var data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (err) {
+    try {
+      data = { body: event.data ? event.data.text() : '' };
+    } catch (ignored) {
+      data = {};
+    }
   }
 
-  e.respondWith(
-    fetch(e.request).then(function (response) {
-      // Cache successful responses
-      if (response.status === 200) {
-        var responseClone = response.clone();
-        caches.open(CACHE_NAME).then(function (cache) {
-          cache.put(e.request, responseClone);
-        });
-      }
-      return response;
-    }).catch(function () {
-      return caches.match(e.request);
-    })
+  var title = data.title || 'Tumanza Admin';
+  var options = {
+    body: data.body || '',
+    icon: ICON,
+    badge: ICON,
+    tag: data.tag || undefined,
+    renotify: Boolean(data.tag),
+    data: { url: data.url || DEFAULT_URL },
+    timestamp: Date.now(),
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  var target =
+    (event.notification.data && event.notification.data.url) || DEFAULT_URL;
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then(function (clientList) {
+        for (var i = 0; i < clientList.length; i += 1) {
+          var client = clientList[i];
+          if ('focus' in client) {
+            return client.focus().then(function () {
+              if ('navigate' in client) {
+                return client.navigate(target).catch(function () {});
+              }
+              return undefined;
+            });
+          }
+        }
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(target);
+        }
+        return undefined;
+      })
   );
 });

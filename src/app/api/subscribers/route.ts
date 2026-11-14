@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import { Subscriber } from '@/models';
 import { requireAdmin, cleanStr, isValidEmail } from '@/lib/auth';
 import { sendWelcomeEmail } from '@/lib/email';
+import { sendAdminPush } from '@/lib/push';
 
 export async function GET(request: Request) {
   try {
@@ -36,9 +37,17 @@ export async function POST(request: Request) {
     }
 
     const date = new Date().toISOString().slice(0, 10);
-    await Subscriber.create({ email, date });
+    const subscriber = await Subscriber.create({ email, date });
 
     sendWelcomeEmail(email).catch(() => {});
+
+    void sendAdminPush({
+      type: 'subscriber',
+      title: 'New newsletter subscriber',
+      body: email,
+      tag: `subscriber:${subscriber._id}`,
+      url: '/tumanza-control-7x9p?section=subscribers',
+    });
 
     return NextResponse.json({ message: 'Subscribed successfully' }, { status: 201 });
   } catch (err: any) {

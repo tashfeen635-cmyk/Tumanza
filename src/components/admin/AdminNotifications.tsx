@@ -3,6 +3,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Bell, BellRing, Mail, ShoppingCart, Star, X } from 'lucide-react';
 import { playNotificationSound, unlockNotificationAudio } from '@/lib/notificationSound';
+import {
+  ensureAdminPushSubscription,
+  isIosDevice,
+  isStandaloneApp,
+  prepareAdminPush,
+  requestPushPermissionAndSubscribe,
+  showServiceWorkerNotification,
+  type PushSubscriptionState,
+} from '@/lib/pushClient';
 
 export type AdminNotificationSection = 'orders' | 'subscribers' | 'reviews';
 
@@ -25,6 +34,25 @@ const SEEN_STORAGE_KEY = 'peaknuts_admin_seen_notifications';
 const POLL_INTERVAL_MS = 20000;
 const MAX_SEEN = 300;
 const MAX_ITEMS = 30;
+
+type PushUiState = PushSubscriptionState | 'checking';
+
+function pushStatusLabel(state: PushUiState): string {
+  if (state === 'subscribed') return 'Push notifications on';
+  if (state === 'denied') return 'Notifications blocked';
+  if (state === 'unsupported') return 'Push not supported';
+  if (state === 'unconfigured') return 'Push not configured';
+  if (state === 'error') return 'Could not enable push';
+  if (state === 'permission-required') return 'Push notifications off';
+  return 'Checking notifications…';
+}
+
+function pushStatusDotClass(state: PushUiState): string {
+  if (state === 'subscribed') return 'bg-emerald-500';
+  if (state === 'denied' || state === 'error') return 'bg-red-500';
+  if (state === 'unconfigured' || state === 'unsupported') return 'bg-amber-500';
+  return 'bg-gray-300';
+}
 
 function readSeen(): { ids: Set<string>; hasHistory: boolean } {
   if (typeof window === 'undefined') return { ids: new Set<string>(), hasHistory: false };
@@ -72,19 +100,15 @@ function iconStyles(type: AdminNotification['type']) {
   return 'bg-emerald-100 text-emerald-700';
 }
 
-function requestBrowserPermission() {
-  if (typeof window === 'undefined' || !('Notification' in window)) return;
-  if (window.Notification.permission === 'default') {
-    window.Notification.requestPermission().catch(() => {});
-  }
-}
-
 export default function AdminNotifications({ adminToken, onNavigate, variant = 'dark' }: AdminNotificationsProps) {
   const isLight = variant === 'light';
   const [items, setItems] = useState<AdminNotification[]>([]);
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
   const [toasts, setToasts] = useState<AdminNotification[]>([]);
+  const [pushState, setPushState] = useState<PushUiState>('checking');
+  const [enablingPush, setEnablingPush] = useState(false);
+  const [showIosHint, setShowIosHint] = useState(false);
 
   const seenRef = useRef<Set<string>>(new Set());
   const hasHistoryRef = useRef(false);
@@ -97,15 +121,55 @@ export default function AdminNotifications({ adminToken, onNavigate, variant = '
   }, [onNavigate]);
 
   useEffect(() => {
+    setShowIosHint(isIosDevice() && !isStandaloneApp());
+  }, []);
+
+  useEffect(() => {
     const { ids, hasHistory } = readSeen();
     seenRef.current = ids;
     hasHistoryRef.current = hasHistory;
   }, []);
 
   useEffect(() => {
+    if (!adminToken) return;
+    let cancelled = false;
+    let permissionStatus: PermissionStatus | null = null;
+
+    const syncSubscription = async () => {
+      await prepareAdminPush(adminToken);
+      const state = await ensureAdminPushSubscription(adminToken);
+      if (!cancelled) setPushState(state);
+    };
+
+    void syncSubscription();
+
+    const onPermissionChange = () => {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        void syncSubscription();
+      }
+    };
+
+    if (typeof navigator !== 'undefined' && navigator.permissions?.query) {
+      navigator.permissions
+        .query({ name: 'notifications' as PermissionName })
+        .then((status) => {
+          permissionStatus = status;
+          status.addEventListener('change', onPermissionChange);
+        })
+        .catch(() => {});
+    }
+
+    return () => {
+      cancelled = true;
+      if (permissionStatus) {
+        permissionStatus.removeEventListener('change', onPermissionChange);
+      }
+    };
+  }, [adminToken]);
+
+  useEffect(() => {
     const unlock = () => {
       unlockNotificationAudio();
-      requestBrowserPermission();
     };
     document.addEventListener('pointerdown', unlock, { once: true });
     document.addEventListener('keydown', unlock, { once: true });
@@ -133,27 +197,33 @@ export default function AdminNotifications({ adminToken, onNavigate, variant = '
     };
   }, [open]);
 
-  const showBrowserNotification = useCallback(
-    (fresh: AdminNotification[]) => {
-      if (typeof window === 'undefined' || !('Notification' in window)) return;
-      if (window.Notification.permission !== 'granted') return;
-      fresh.slice(0, 3).forEach((item) => {
-        try {
-          const native = new window.Notification(item.title, {
-            body: item.message,
-            tag: item.id,
-            icon: '/favicon.ico',
-          });
-          native.onclick = () => {
-            window.focus();
-            onNavigateRef.current(item.section);
-            native.close();
-          };
-        } catch {}
+  const showBrowserNotification = useCallback(async (fresh: AdminNotification[]) => {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+    if (window.Notification.permission !== 'granted') return;
+
+    for (const item of fresh.slice(0, 3)) {
+      const shown = await showServiceWorkerNotification({
+        id: item.id,
+        title: item.title,
+        message: item.message,
+        section: item.section,
       });
-    },
-    []
-  );
+      if (shown) continue;
+
+      try {
+        const native = new window.Notification(item.title, {
+          body: item.message,
+          tag: item.id,
+          icon: '/icons/icon-192.png',
+        });
+        native.onclick = () => {
+          window.focus();
+          onNavigateRef.current(item.section);
+          native.close();
+        };
+      } catch {}
+    }
+  }, []);
 
   const poll = useCallback(async () => {
     if (!adminToken) return;
@@ -197,11 +267,13 @@ export default function AdminNotifications({ adminToken, onNavigate, variant = '
 
       if (!isFirstPoll) {
         playNotificationSound();
-        showBrowserNotification(fresh);
+        if (pushState !== 'subscribed') {
+          void showBrowserNotification(fresh);
+        }
         setToasts((prev) => fresh.concat(prev).slice(0, 3));
       }
     } catch {}
-  }, [adminToken, showBrowserNotification]);
+  }, [adminToken, pushState, showBrowserNotification]);
 
   useEffect(() => {
     if (!adminToken) return;
@@ -234,9 +306,56 @@ export default function AdminNotifications({ adminToken, onNavigate, variant = '
 
   const handleToggle = () => {
     unlockNotificationAudio();
-    requestBrowserPermission();
-    if (!open) setUnread(0);
+    if (!open) {
+      setUnread(0);
+      if (
+        adminToken &&
+        typeof Notification !== 'undefined' &&
+        Notification.permission === 'granted' &&
+        pushState !== 'subscribed'
+      ) {
+        void ensureAdminPushSubscription(adminToken)
+          .then((state) => setPushState(state))
+          .catch(() => {});
+      }
+    }
     setOpen((value) => !value);
+  };
+
+  const handleEnablePush = async () => {
+    if (!adminToken || enablingPush) return;
+
+    if (pushState === 'subscribed') {
+      const shown = await showServiceWorkerNotification({
+        id: `test:${Date.now()}`,
+        title: 'Tumanza admin notifications',
+        message: 'This is a test alert. New orders, subscribers and reviews will look like this.',
+        section: 'orders',
+      });
+      if (!shown) {
+        try {
+          new Notification('Tumanza admin notifications', {
+            body: 'This is a test alert.',
+            icon: '/icons/icon-192.png',
+          });
+        } catch {}
+      }
+      return;
+    }
+
+    setEnablingPush(true);
+    const state = await requestPushPermissionAndSubscribe(adminToken);
+    setPushState(state);
+    setEnablingPush(false);
+
+    if (state === 'subscribed') {
+      await showServiceWorkerNotification({
+        id: `test:${Date.now()}`,
+        title: 'Push notifications enabled',
+        message: 'You will now receive order, subscriber and review alerts on this device.',
+        section: 'orders',
+      });
+    }
   };
 
   const handleOpenItem = (item: AdminNotification) => {
@@ -330,6 +449,45 @@ export default function AdminNotifications({ adminToken, onNavigate, variant = '
                   </button>
                 );
               })
+            )}
+          </div>
+
+          <div className="border-t border-gray-100 px-4 py-3 space-y-1.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${pushStatusDotClass(pushState)}`} />
+                <span className="text-[10px] font-semibold text-brand-charcoal truncate">
+                  {pushStatusLabel(pushState)}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleEnablePush}
+                disabled={enablingPush}
+                className="text-[10px] font-bold text-brand-darkgreen hover:underline disabled:opacity-50 shrink-0"
+              >
+                {enablingPush ? 'Enabling…' : pushState === 'subscribed' ? 'Send test' : 'Enable'}
+              </button>
+            </div>
+            {pushState === 'denied' && (
+              <p className="text-[10px] text-red-500 leading-snug">
+                Allow notifications in your browser site settings, then tap Enable.
+              </p>
+            )}
+            {pushState === 'unconfigured' && (
+              <p className="text-[10px] text-amber-600 leading-snug">
+                Push notifications are not configured on the server yet.
+              </p>
+            )}
+            {pushState === 'unsupported' && (
+              <p className="text-[10px] text-gray-500 leading-snug">
+                This browser does not support web push notifications.
+              </p>
+            )}
+            {showIosHint && pushState !== 'subscribed' && (
+              <p className="text-[10px] text-gray-500 leading-snug">
+                On iPhone, tap Share → “Add to Home Screen”, open Tumanza from your home screen, then tap Enable.
+              </p>
             )}
           </div>
         </div>

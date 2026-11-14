@@ -30,6 +30,17 @@ Configure these in `.env.local` (for development) and in your deployment dashboa
 | `EMAIL_USER` | no | Gmail SMTP address for order confirmations and reset codes |
 | `EMAIL_PASS` | no | Gmail App password |
 | `SITE_URL` | no | Base URL for email verification links (e.g. `http://localhost:3000`) |
+| `VAPID_PUBLIC_KEY` | yes (push) | Web Push public key |
+| `VAPID_PRIVATE_KEY` | yes (push) | Web Push private key — keep secret |
+| `VAPID_SUBJECT` | no | Contact URI for push, e.g. `https://tumanza.com` |
+
+## Admin Push Notifications
+
+New orders, subscribers and reviews trigger Web Push alerts (including lock-screen alerts) on devices where the admin enabled them. Tap the bell on the admin dashboard and choose **Enable**.
+
+- **Desktop / Android:** log in to the admin dashboard, tap the bell, tap **Enable** and allow notifications.
+- **iPhone / iPad (iOS 16.4+):** open the site in Safari, tap Share → **Add to Home Screen**, open Tumanza from the home screen, log in, then tap the bell → **Enable**.
+- Push requires the `VAPID_*` variables above and HTTPS.
 
 ## Local Development
 
